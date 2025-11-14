@@ -1,5 +1,6 @@
 
 import { Leftover } from '@/types/leftover';
+import { notificationManager } from './notificationManager';
 
 const STORAGE_KEY = '@leftovers_storage';
 
@@ -29,7 +30,22 @@ export const leftoverStorage = {
 
   async add(leftover: Leftover): Promise<void> {
     const leftovers = await this.getAll();
-    leftovers.push(leftover);
+    
+    // Calculate expiry date and schedule notification
+    const expiryDate = calculateExpiryDate(leftover.dateAdded, leftover.daysUntilExpiry);
+    const notificationId = await notificationManager.scheduleExpiryNotification(
+      leftover.id,
+      leftover.name,
+      expiryDate
+    );
+    
+    // Add notification ID to leftover
+    const leftoverWithNotification = {
+      ...leftover,
+      notificationId: notificationId || undefined,
+    };
+    
+    leftovers.push(leftoverWithNotification);
     await this.save(leftovers);
   },
 
@@ -37,17 +53,55 @@ export const leftoverStorage = {
     const leftovers = await this.getAll();
     const index = leftovers.findIndex(l => l.id === id);
     if (index !== -1) {
-      leftovers[index] = { ...leftovers[index], ...updates };
+      const oldLeftover = leftovers[index];
+      
+      // Cancel old notification if it exists
+      if (oldLeftover.notificationId) {
+        await notificationManager.cancelNotification(oldLeftover.notificationId);
+      }
+      
+      // Update leftover
+      leftovers[index] = { ...oldLeftover, ...updates };
+      
+      // If date or expiry days changed, reschedule notification
+      if (updates.dateAdded || updates.daysUntilExpiry) {
+        const updatedLeftover = leftovers[index];
+        const expiryDate = calculateExpiryDate(
+          updatedLeftover.dateAdded,
+          updatedLeftover.daysUntilExpiry
+        );
+        const notificationId = await notificationManager.scheduleExpiryNotification(
+          updatedLeftover.id,
+          updatedLeftover.name,
+          expiryDate
+        );
+        leftovers[index].notificationId = notificationId || undefined;
+      }
+      
       await this.save(leftovers);
     }
   },
 
   async delete(id: string): Promise<void> {
     const leftovers = await this.getAll();
+    const leftover = leftovers.find(l => l.id === id);
+    
+    // Cancel notification if it exists
+    if (leftover?.notificationId) {
+      await notificationManager.cancelNotification(leftover.notificationId);
+    }
+    
     const filtered = leftovers.filter(l => l.id !== id);
     await this.save(filtered);
   },
 };
+
+export function calculateExpiryDate(dateAdded: string, daysUntilExpiry: number): Date {
+  const addedDate = new Date(dateAdded);
+  const expiryDate = new Date(addedDate);
+  expiryDate.setDate(expiryDate.getDate() + daysUntilExpiry);
+  return expiryDate;
+}
 
 export function calculateDaysRemaining(dateAdded: string, daysUntilExpiry: number): number {
   const addedDate = new Date(dateAdded);

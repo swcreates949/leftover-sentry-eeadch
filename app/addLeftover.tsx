@@ -15,58 +15,45 @@ import { IconSymbol } from '@/components/IconSymbol';
 import { colors, commonStyles } from '@/styles/commonStyles';
 import { Leftover, LEFTOVER_CATEGORIES, DEFAULT_EXPIRY_DAYS } from '@/types/leftover';
 import { leftoverStorage } from '@/utils/leftoverStorage';
-import * as Haptics from 'expo-haptics';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Haptics from 'expo-haptics';
 
 export default function AddLeftoverScreen() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [dateAdded, setDateAdded] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('Other');
-  const [customDays, setCustomDays] = useState('');
+  const [category, setCategory] = useState<string>('');
+  const [daysUntilExpiry, setDaysUntilExpiry] = useState('');
   const [notes, setNotes] = useState('');
-  const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     if (!name.trim()) {
-      if (Platform.OS === 'web') {
-        window.alert('Please enter a name for the leftover');
-      } else {
-        Alert.alert('Missing Information', 'Please enter a name for the leftover');
-      }
+      Alert.alert('Error', 'Please enter a name for the leftover');
       return;
     }
 
-    setSaving(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (!daysUntilExpiry || parseInt(daysUntilExpiry) <= 0) {
+      Alert.alert('Error', 'Please enter valid days until expiry');
+      return;
+    }
 
-    const daysUntilExpiry = customDays
-      ? parseInt(customDays, 10)
-      : DEFAULT_EXPIRY_DAYS[selectedCategory] || 3;
-
-    const newLeftover: Leftover = {
+    const leftover: Leftover = {
       id: Date.now().toString(),
       name: name.trim(),
       dateAdded: dateAdded.toISOString(),
-      daysUntilExpiry,
-      category: selectedCategory,
+      daysUntilExpiry: parseInt(daysUntilExpiry),
+      category: category || undefined,
       notes: notes.trim() || undefined,
     };
 
     try {
-      await leftoverStorage.add(newLeftover);
+      await leftoverStorage.add(leftover);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back();
     } catch (error) {
       console.log('Error saving leftover:', error);
-      if (Platform.OS === 'web') {
-        window.alert('Failed to save leftover');
-      } else {
-        Alert.alert('Error', 'Failed to save leftover');
-      }
-    } finally {
-      setSaving(false);
+      Alert.alert('Error', 'Failed to save leftover');
     }
   };
 
@@ -77,58 +64,54 @@ export default function AddLeftoverScreen() {
     }
   };
 
-  const handleCategorySelect = (category: string) => {
+  const handleCategorySelect = (selectedCategory: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setSelectedCategory(category);
-    setCustomDays('');
+    setCategory(selectedCategory);
+    const defaultDays = DEFAULT_EXPIRY_DAYS[selectedCategory];
+    if (defaultDays) {
+      setDaysUntilExpiry(defaultDays.toString());
+    }
   };
 
   return (
     <View style={commonStyles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <IconSymbol
-            ios_icon_name="chevron.left"
-            android_material_icon_name="arrow-back"
-            size={24}
-            color={colors.text}
-          />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Add Leftover</Text>
-        <View style={{ width: 24 }} />
-      </View>
-
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
       >
+        <View style={styles.infoCard}>
+          <IconSymbol
+            ios_icon_name="bell.badge.fill"
+            android_material_icon_name="notifications_active"
+            size={24}
+            color={colors.primary}
+          />
+          <Text style={styles.infoText}>
+            You&apos;ll receive a notification when this item expires!
+          </Text>
+        </View>
+
         <View style={styles.section}>
           <Text style={styles.label}>Name *</Text>
           <TextInput
             style={styles.input}
-            placeholder="e.g., Chicken Soup"
-            placeholderTextColor={colors.textSecondary}
             value={name}
             onChangeText={setName}
-            autoFocus={Platform.OS !== 'web'}
+            placeholder="e.g., Chicken Soup"
+            placeholderTextColor={colors.textSecondary}
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Date Added</Text>
+          <Text style={styles.label}>Date Added *</Text>
           <TouchableOpacity
             style={styles.dateButton}
             onPress={() => setShowDatePicker(true)}
           >
             <IconSymbol
               ios_icon_name="calendar"
-              android_material_icon_name="calendar-today"
+              android_material_icon_name="calendar_today"
               size={20}
               color={colors.primary}
             />
@@ -148,23 +131,22 @@ export default function AddLeftoverScreen() {
         <View style={styles.section}>
           <Text style={styles.label}>Category</Text>
           <View style={styles.categoryGrid}>
-            {LEFTOVER_CATEGORIES.map((category, index) => (
+            {LEFTOVER_CATEGORIES.map((cat, index) => (
               <React.Fragment key={index}>
                 <TouchableOpacity
                   style={[
                     styles.categoryButton,
-                    selectedCategory === category && styles.categoryButtonActive,
+                    category === cat && styles.categoryButtonActive,
                   ]}
-                  onPress={() => handleCategorySelect(category)}
-                  activeOpacity={0.7}
+                  onPress={() => handleCategorySelect(cat)}
                 >
                   <Text
                     style={[
                       styles.categoryText,
-                      selectedCategory === category && styles.categoryTextActive,
+                      category === cat && styles.categoryTextActive,
                     ]}
                   >
-                    {category}
+                    {cat}
                   </Text>
                 </TouchableOpacity>
               </React.Fragment>
@@ -173,78 +155,69 @@ export default function AddLeftoverScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>
-            Days Until Expiry (Default: {DEFAULT_EXPIRY_DAYS[selectedCategory] || 3})
-          </Text>
+          <Text style={styles.label}>Days Until Expiry *</Text>
           <TextInput
             style={styles.input}
-            placeholder={`${DEFAULT_EXPIRY_DAYS[selectedCategory] || 3} days`}
+            value={daysUntilExpiry}
+            onChangeText={setDaysUntilExpiry}
+            placeholder="e.g., 3"
             placeholderTextColor={colors.textSecondary}
-            value={customDays}
-            onChangeText={setCustomDays}
             keyboardType="number-pad"
           />
+          <Text style={styles.helperText}>
+            How many days from the date added until it expires
+          </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.label}>Notes (Optional)</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
-            placeholder="Add any additional notes..."
-            placeholderTextColor={colors.textSecondary}
             value={notes}
             onChangeText={setNotes}
+            placeholder="Add any additional notes..."
+            placeholderTextColor={colors.textSecondary}
             multiline
             numberOfLines={4}
             textAlignVertical="top"
           />
         </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.saveButton, saving && styles.saveButtonDisabled]}
-            onPress={handleSave}
-            disabled={saving}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.saveButtonText}>
-              {saving ? 'Saving...' : 'Save Leftover'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.saveButton}
+          onPress={handleSave}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.saveButtonText}>Save Leftover</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: Platform.OS === 'android' ? 48 : 16,
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: colors.card,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
-    elevation: 3,
-  },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text,
-  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     padding: 20,
     paddingBottom: 40,
+  },
+  infoCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.highlight,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 24,
+    gap: 12,
+  },
+  infoText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.primary,
+    lineHeight: 20,
   },
   section: {
     marginBottom: 24,
@@ -262,11 +235,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
     borderWidth: 1,
-    borderColor: colors.highlight,
+    borderColor: colors.border,
   },
   textArea: {
     minHeight: 100,
     paddingTop: 16,
+  },
+  helperText: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 6,
+    fontStyle: 'italic',
   },
   dateButton: {
     flexDirection: 'row',
@@ -276,12 +255,12 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
     borderWidth: 1,
-    borderColor: colors.highlight,
+    borderColor: colors.border,
   },
   dateText: {
     fontSize: 16,
-    fontWeight: '500',
     color: colors.text,
+    fontWeight: '500',
   },
   categoryGrid: {
     flexDirection: 'row',
@@ -289,12 +268,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   categoryButton: {
-    backgroundColor: colors.card,
-    borderRadius: 20,
-    paddingVertical: 10,
     paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: colors.highlight,
+    borderColor: colors.border,
   },
   categoryButtonActive: {
     backgroundColor: colors.primary,
@@ -306,23 +285,20 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   categoryTextActive: {
-    color: '#ffffff',
-  },
-  buttonContainer: {
-    marginTop: 16,
+    color: '#FFFFFF',
   },
   saveButton: {
     backgroundColor: colors.primary,
     borderRadius: 12,
-    padding: 16,
+    padding: 18,
     alignItems: 'center',
-  },
-  saveButtonDisabled: {
-    opacity: 0.6,
+    marginTop: 8,
+    boxShadow: '0px 4px 12px rgba(41, 171, 226, 0.3)',
+    elevation: 4,
   },
   saveButtonText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#ffffff',
+    color: '#FFFFFF',
   },
 });

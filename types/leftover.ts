@@ -6,6 +6,7 @@ export interface Leftover {
   daysUntilExpiry: number;
   category?: string;
   notes?: string;
+  notificationId?: string;
 }
 
 export const LEFTOVER_CATEGORIES = [
