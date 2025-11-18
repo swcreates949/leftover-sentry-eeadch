@@ -163,7 +163,7 @@ export default function FloatingTabBar({
               return (
                 <React.Fragment key={index}>
                   <TouchableOpacity
-                    style={styles.tab}
+                    style={[styles.tab, { backgroundColor: "#ffffff" }]}
                     onPress={() => handleTabPress(tab.route)}
                     activeOpacity={0.7}
                   >

@@ -8,6 +8,7 @@ import {
   ScrollView,
   Platform,
   Alert,
+  Image,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
@@ -117,6 +118,12 @@ export default function LeftoverDetailScreen() {
           />
           <Text style={[styles.statusText, { color: statusColor }]}>{statusText}</Text>
         </View>
+
+        {leftover.imageUri && (
+          <View style={styles.imageCard}>
+            <Image source={{ uri: leftover.imageUri }} style={styles.leftoverImage} />
+          </View>
+        )}
 
         <View style={styles.card}>
           <View style={styles.iconHeader}>
@@ -287,6 +294,18 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     marginTop: 12,
+  },
+  imageCard: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 20,
+    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+    elevation: 4,
+  },
+  leftoverImage: {
+    width: '100%',
+    height: 300,
+    backgroundColor: colors.card,
   },
   card: {
     backgroundColor: colors.card,

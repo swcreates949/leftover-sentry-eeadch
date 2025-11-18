@@ -9,6 +9,7 @@ import {
   ScrollView,
   Platform,
   Alert,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
@@ -17,6 +18,7 @@ import { Leftover, LEFTOVER_CATEGORIES, DEFAULT_EXPIRY_DAYS } from '@/types/left
 import { leftoverStorage } from '@/utils/leftoverStorage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Haptics from 'expo-haptics';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function AddLeftoverScreen() {
   const router = useRouter();
@@ -26,6 +28,7 @@ export default function AddLeftoverScreen() {
   const [category, setCategory] = useState<string>('');
   const [daysUntilExpiry, setDaysUntilExpiry] = useState('');
   const [notes, setNotes] = useState('');
+  const [imageUri, setImageUri] = useState<string | null>(null);
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -45,6 +48,7 @@ export default function AddLeftoverScreen() {
       daysUntilExpiry: parseInt(daysUntilExpiry),
       category: category || undefined,
       notes: notes.trim() || undefined,
+      imageUri: imageUri || undefined,
     };
 
     try {
@@ -73,6 +77,88 @@ export default function AddLeftoverScreen() {
     }
   };
 
+  const handleTakePhoto = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+      
+      if (!permissionResult.granted) {
+        Alert.alert(
+          'Permission Required',
+          'Camera permission is required to take photos of your leftovers.'
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      });
+
+      console.log('Camera result:', result);
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        setImageUri(result.assets[0].uri);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+    } catch (error) {
+      console.log('Error taking photo:', error);
+      Alert.alert('Error', 'Failed to take photo. Please try again.');
+    }
+  };
+
+  const handlePickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      });
+
+      console.log('Image picker result:', result);
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        setImageUri(result.assets[0].uri);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+    } catch (error) {
+      console.log('Error picking image:', error);
+      Alert.alert('Error', 'Failed to pick image. Please try again.');
+    }
+  };
+
+  const handleRemoveImage = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setImageUri(null);
+  };
+
+  const showImageOptions = () => {
+    if (Platform.OS === 'web') {
+      handlePickImage();
+    } else {
+      Alert.alert(
+        'Add Photo',
+        'Choose how you want to add a photo',
+        [
+          {
+            text: 'Take Photo',
+            onPress: handleTakePhoto,
+          },
+          {
+            text: 'Choose from Library',
+            onPress: handlePickImage,
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ]
+      );
+    }
+  };
+
   return (
     <View style={commonStyles.container}>
       <ScrollView
@@ -90,6 +176,43 @@ export default function AddLeftoverScreen() {
           <Text style={styles.infoText}>
             You&apos;ll receive a notification when this item expires!
           </Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.label}>Photo (Optional)</Text>
+          {imageUri ? (
+            <View style={styles.imageContainer}>
+              <Image source={{ uri: imageUri }} style={styles.image} />
+              <TouchableOpacity
+                style={styles.removeImageButton}
+                onPress={handleRemoveImage}
+                activeOpacity={0.8}
+              >
+                <IconSymbol
+                  ios_icon_name="xmark.circle.fill"
+                  android_material_icon_name="cancel"
+                  size={32}
+                  color={colors.danger}
+                />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.photoButton}
+              onPress={showImageOptions}
+              activeOpacity={0.8}
+            >
+              <IconSymbol
+                ios_icon_name="camera.fill"
+                android_material_icon_name="photo_camera"
+                size={32}
+                color={colors.primary}
+              />
+              <Text style={styles.photoButtonText}>
+                {Platform.OS === 'web' ? 'Add Photo' : 'Take or Choose Photo'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.section}>
@@ -286,6 +409,42 @@ const styles = StyleSheet.create({
   },
   categoryTextActive: {
     color: '#FFFFFF',
+  },
+  photoButton: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.primary,
+    borderStyle: 'dashed',
+    gap: 12,
+  },
+  photoButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  imageContainer: {
+    position: 'relative',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  image: {
+    width: '100%',
+    height: 250,
+    borderRadius: 12,
+    backgroundColor: colors.card,
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 16,
+    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.2)',
+    elevation: 4,
   },
   saveButton: {
     backgroundColor: colors.primary,

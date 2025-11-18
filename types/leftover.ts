@@ -7,6 +7,7 @@ export interface Leftover {
   category?: string;
   notes?: string;
   notificationId?: string;
+  imageUri?: string;
 }
 
 export const LEFTOVER_CATEGORIES = [
