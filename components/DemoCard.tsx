@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link } from "expo-router";
-import { Pressable, StyleSheet, View, Text } from "react-native";
+import { Pressable, StyleSheet, View, Text, Image } from "react-native";
 import { IconSymbol } from "@/components/IconSymbol";
 import { useTheme } from "@react-navigation/native";
 import { ModalDemo } from "./homeData";
@@ -36,11 +36,10 @@ export function DemoCard({ item }: DemoCardProps) {
       <Link href={item.route as any} asChild>
         <Pressable>
           <View style={styles.chevronContainer}>
-            <IconSymbol 
-              ios_icon_name="chevron.right" 
-              android_material_icon_name="chevron_right" 
-              color={theme.colors.text} 
-              size={24} 
+            <Image
+              source={require('@/assets/images/4ff59fe4-a563-4d9b-9f5f-84f5af0fe16c.png')}
+              style={{ width: 24, height: 24, tintColor: theme.colors.text }}
+              resizeMode="contain"
             />
           </View>
         </Pressable>

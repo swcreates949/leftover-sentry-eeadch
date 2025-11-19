@@ -1,6 +1,6 @@
 
 import React from "react";
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, useWindowDimensions } from "react-native";
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, useWindowDimensions, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { IconSymbol } from "@/components/IconSymbol";
 import { colors, commonStyles } from "@/styles/commonStyles";
@@ -15,6 +15,7 @@ export default function HomeScreen() {
   const iconSize = Math.min(width * 0.18, 70);
   const heroTitleSize = Math.min(width * 0.08, 32);
   const heroSubtitleSize = Math.min(width * 0.045, 16);
+  const chevronSize = Math.min(width * 0.055, 22);
 
   const handleNavigateToLeftovers = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -68,11 +69,10 @@ export default function HomeScreen() {
               Add items to your fridge and see how many days they have left
             </Text>
           </View>
-          <IconSymbol
-            ios_icon_name="chevron.right"
-            android_material_icon_name="chevron_right"
-            size={Math.min(width * 0.055, 22)}
-            color={colors.textSecondary}
+          <Image
+            source={require('@/assets/images/4ff59fe4-a563-4d9b-9f5f-84f5af0fe16c.png')}
+            style={{ width: chevronSize, height: chevronSize, tintColor: colors.textSecondary }}
+            resizeMode="contain"
           />
         </TouchableOpacity>
 
@@ -97,11 +97,10 @@ export default function HomeScreen() {
               Discover recipes based on your leftovers and rate them
             </Text>
           </View>
-          <IconSymbol
-            ios_icon_name="chevron.right"
-            android_material_icon_name="chevron_right"
-            size={Math.min(width * 0.055, 22)}
-            color="#ffffff"
+          <Image
+            source={require('@/assets/images/4ff59fe4-a563-4d9b-9f5f-84f5af0fe16c.png')}
+            style={{ width: chevronSize, height: chevronSize, tintColor: '#ffffff' }}
+            resizeMode="contain"
           />
         </TouchableOpacity>
 

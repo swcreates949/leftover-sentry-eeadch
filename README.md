@@ -1,5 +1,5 @@
 # Leftover Tracker
 
-This app was the idea of Scott Weisgerber, a cook and dad who was tired of seeing leftover go to weste. 
+This app was built using [Natively.dev](https://natively.dev) - a platform for creating mobile and web applications.
 
-Copyright 2025. 
+Made with 💙 for creativity.
