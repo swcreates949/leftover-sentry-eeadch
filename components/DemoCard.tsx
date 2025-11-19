@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "expo-router";
 import { Pressable, StyleSheet, View, Text } from "react-native";
@@ -34,15 +35,13 @@ export function DemoCard({ item }: DemoCardProps) {
       </View>
       <Link href={item.route as any} asChild>
         <Pressable>
-          <View
-            style={[
-              styles.tryButton,
-              { backgroundColor: theme.dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)' }
-            ]}
-          >
-            <Text style={[styles.tryButtonText, { color: theme.colors.primary }]}>
-              Try It
-            </Text>
+          <View style={styles.chevronContainer}>
+            <IconSymbol 
+              ios_icon_name="chevron.right" 
+              android_material_icon_name="chevron_right" 
+              color={theme.colors.text} 
+              size={24} 
+            />
           </View>
         </Pressable>
       </Link>
@@ -78,13 +77,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 18,
   },
-  tryButton: {
-    paddingHorizontal: 16,
+  chevronContainer: {
+    paddingHorizontal: 8,
     paddingVertical: 8,
-    borderRadius: 6,
-  },
-  tryButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
   },
 });
