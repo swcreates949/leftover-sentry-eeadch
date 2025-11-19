@@ -72,32 +72,28 @@ export default function RecipesScreen() {
   };
 
   const renderStarRating = (recipe: RecipeSuggestion) => {
-    const stars = [1, 2, 3, 4, 5];
+    const ratings = [1, 2, 3, 4, 5];
     
     return (
       <View style={styles.ratingContainer}>
         <Text style={styles.ratingLabel}>Rate this recipe:</Text>
         <View style={styles.starsContainer}>
-          {stars.map((star, index) => (
+          {ratings.map((rating, index) => (
             <React.Fragment key={index}>
               <TouchableOpacity
-                onPress={() => handleRating(recipe.id, star)}
+                onPress={() => handleRating(recipe.id, rating)}
                 hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
               >
                 <IconSymbol
                   ios_icon_name={
-                    recipe.userRating && star <= recipe.userRating
-                      ? 'star.fill'
-                      : 'star'
+                    recipe.userRating && rating <= recipe.userRating
+                      ? 'fork.knife.circle.fill'
+                      : 'fork.knife.circle'
                   }
-                  android_material_icon_name={
-                    recipe.userRating && star <= recipe.userRating
-                      ? 'star'
-                      : 'star_border'
-                  }
-                  size={28}
+                  android_material_icon_name="restaurant"
+                  size={32}
                   color={
-                    recipe.userRating && star <= recipe.userRating
+                    recipe.userRating && rating <= recipe.userRating
                       ? colors.warning
                       : colors.textSecondary
                   }
