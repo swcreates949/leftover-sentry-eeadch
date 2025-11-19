@@ -10,6 +10,7 @@ import {
   Platform,
   Alert,
   Image,
+  useWindowDimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
@@ -22,6 +23,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 export default function AddLeftoverScreen() {
   const router = useRouter();
+  const { width, height } = useWindowDimensions();
   const [name, setName] = useState('');
   const [dateAdded, setDateAdded] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -29,6 +31,12 @@ export default function AddLeftoverScreen() {
   const [daysUntilExpiry, setDaysUntilExpiry] = useState('');
   const [notes, setNotes] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
+
+  // Responsive sizing
+  const padding = width * 0.05;
+  const fontSize = Math.min(width * 0.04, 16);
+  const labelSize = Math.min(width * 0.042, 16);
+  const iconSize = Math.min(width * 0.07, 28);
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -64,17 +72,14 @@ export default function AddLeftoverScreen() {
   const handleDateChange = (event: any, selectedDate?: Date) => {
     console.log('Date change event:', event.type, selectedDate);
     
-    // Handle Android dismissal
     if (Platform.OS === 'android') {
       setShowDatePicker(false);
       
-      // Only update date if user didn't dismiss
       if (event.type === 'set' && selectedDate) {
         setDateAdded(selectedDate);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
     } else {
-      // iOS - update date immediately as user scrolls
       if (selectedDate) {
         setDateAdded(selectedDate);
       }
@@ -196,26 +201,28 @@ export default function AddLeftoverScreen() {
     <View style={commonStyles.container}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { padding, paddingBottom: 40 }]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.infoCard}>
+        <View style={[styles.infoCard, { padding: width * 0.04 }]}>
           <IconSymbol
             ios_icon_name="bell.badge.fill"
             android_material_icon_name="notifications_active"
-            size={24}
+            size={Math.min(width * 0.055, 22)}
             color={colors.primary}
           />
-          <Text style={styles.infoText}>
+          <Text style={[styles.infoText, { fontSize: Math.min(width * 0.035, 13) }]}>
             You&apos;ll receive a notification when this item expires!
           </Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Photo (Optional)</Text>
+        <View style={[styles.section, { marginBottom: height * 0.02 }]}>
+          <Text style={[styles.label, { fontSize: labelSize, marginBottom: height * 0.01 }]}>
+            Photo (Optional)
+          </Text>
           {imageUri ? (
             <View style={styles.imageContainer}>
-              <Image source={{ uri: imageUri }} style={styles.image} />
+              <Image source={{ uri: imageUri }} style={[styles.image, { height: height * 0.25 }]} />
               <TouchableOpacity
                 style={styles.removeImageButton}
                 onPress={handleRemoveImage}
@@ -224,34 +231,34 @@ export default function AddLeftoverScreen() {
                 <IconSymbol
                   ios_icon_name="xmark.circle.fill"
                   android_material_icon_name="cancel"
-                  size={32}
+                  size={iconSize}
                   color={colors.danger}
                 />
               </TouchableOpacity>
             </View>
           ) : (
             <TouchableOpacity
-              style={styles.photoButton}
+              style={[styles.photoButton, { padding: height * 0.025 }]}
               onPress={showImageOptions}
               activeOpacity={0.8}
             >
               <IconSymbol
                 ios_icon_name="camera.fill"
                 android_material_icon_name="photo_camera"
-                size={32}
+                size={iconSize}
                 color={colors.primary}
               />
-              <Text style={styles.photoButtonText}>
+              <Text style={[styles.photoButtonText, { fontSize }]}>
                 {Platform.OS === 'web' ? 'Add Photo' : 'Take or Choose Photo'}
               </Text>
             </TouchableOpacity>
           )}
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Name *</Text>
+        <View style={[styles.section, { marginBottom: height * 0.02 }]}>
+          <Text style={[styles.label, { fontSize: labelSize, marginBottom: height * 0.01 }]}>Name *</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { padding: width * 0.04, fontSize }]}
             value={name}
             onChangeText={setName}
             placeholder="e.g., Chicken Soup"
@@ -259,10 +266,10 @@ export default function AddLeftoverScreen() {
           />
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Date Added *</Text>
+        <View style={[styles.section, { marginBottom: height * 0.02 }]}>
+          <Text style={[styles.label, { fontSize: labelSize, marginBottom: height * 0.01 }]}>Date Added *</Text>
           <TouchableOpacity
-            style={styles.dateButton}
+            style={[styles.dateButton, { padding: width * 0.04 }]}
             onPress={toggleDatePicker}
             activeOpacity={0.8}
           >
@@ -270,28 +277,28 @@ export default function AddLeftoverScreen() {
               <IconSymbol
                 ios_icon_name="calendar"
                 android_material_icon_name="calendar_today"
-                size={20}
+                size={Math.min(width * 0.05, 18)}
                 color={colors.primary}
               />
-              <Text style={styles.dateText}>{formatDateDisplay(dateAdded)}</Text>
+              <Text style={[styles.dateText, { fontSize }]}>{formatDateDisplay(dateAdded)}</Text>
             </View>
             <IconSymbol
               ios_icon_name={showDatePicker ? "chevron.up" : "chevron.down"}
               android_material_icon_name={showDatePicker ? "expand_less" : "expand_more"}
-              size={20}
+              size={Math.min(width * 0.05, 18)}
               color={colors.textSecondary}
             />
           </TouchableOpacity>
           
           {showDatePicker && Platform.OS === 'ios' && (
             <View style={styles.datePickerContainer}>
-              <View style={styles.datePickerHeader}>
-                <Text style={styles.datePickerTitle}>Select Date</Text>
+              <View style={[styles.datePickerHeader, { paddingHorizontal: width * 0.04, paddingVertical: height * 0.015 }]}>
+                <Text style={[styles.datePickerTitle, { fontSize }]}>Select Date</Text>
                 <TouchableOpacity
                   onPress={closeDatePicker}
-                  style={styles.doneButton}
+                  style={[styles.doneButton, { paddingHorizontal: width * 0.04, paddingVertical: height * 0.008 }]}
                 >
-                  <Text style={styles.doneButtonText}>Done</Text>
+                  <Text style={[styles.doneButtonText, { fontSize: Math.min(width * 0.035, 14) }]}>Done</Text>
                 </TouchableOpacity>
               </View>
               <DateTimePicker
@@ -316,14 +323,15 @@ export default function AddLeftoverScreen() {
           )}
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Category</Text>
+        <View style={[styles.section, { marginBottom: height * 0.02 }]}>
+          <Text style={[styles.label, { fontSize: labelSize, marginBottom: height * 0.01 }]}>Category</Text>
           <View style={styles.categoryGrid}>
             {LEFTOVER_CATEGORIES.map((cat, index) => (
               <React.Fragment key={index}>
                 <TouchableOpacity
                   style={[
                     styles.categoryButton,
+                    { paddingHorizontal: width * 0.04, paddingVertical: height * 0.012 },
                     category === cat && styles.categoryButtonActive,
                   ]}
                   onPress={() => handleCategorySelect(cat)}
@@ -331,6 +339,7 @@ export default function AddLeftoverScreen() {
                   <Text
                     style={[
                       styles.categoryText,
+                      { fontSize: Math.min(width * 0.035, 13) },
                       category === cat && styles.categoryTextActive,
                     ]}
                   >
@@ -342,25 +351,29 @@ export default function AddLeftoverScreen() {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Days Until Expiry *</Text>
+        <View style={[styles.section, { marginBottom: height * 0.02 }]}>
+          <Text style={[styles.label, { fontSize: labelSize, marginBottom: height * 0.01 }]}>
+            Days Until Expiry *
+          </Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { padding: width * 0.04, fontSize }]}
             value={daysUntilExpiry}
             onChangeText={setDaysUntilExpiry}
             placeholder="e.g., 3"
             placeholderTextColor={colors.textSecondary}
             keyboardType="number-pad"
           />
-          <Text style={styles.helperText}>
+          <Text style={[styles.helperText, { fontSize: Math.min(width * 0.032, 12), marginTop: height * 0.008 }]}>
             How many days from the date added until it expires
           </Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Notes (Optional)</Text>
+        <View style={[styles.section, { marginBottom: height * 0.02 }]}>
+          <Text style={[styles.label, { fontSize: labelSize, marginBottom: height * 0.01 }]}>
+            Notes (Optional)
+          </Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            style={[styles.input, styles.textArea, { padding: width * 0.04, fontSize, minHeight: height * 0.12 }]}
             value={notes}
             onChangeText={setNotes}
             placeholder="Add any additional notes..."
@@ -372,11 +385,13 @@ export default function AddLeftoverScreen() {
         </View>
 
         <TouchableOpacity
-          style={styles.saveButton}
+          style={[styles.saveButton, { padding: height * 0.02 }]}
           onPress={handleSave}
           activeOpacity={0.8}
         >
-          <Text style={styles.saveButtonText}>Save Leftover</Text>
+          <Text style={[styles.saveButtonText, { fontSize: Math.min(width * 0.045, 17) }]}>
+            Save Leftover
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -388,51 +403,39 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
   },
   infoCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.highlight,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 24,
-    gap: 12,
+    borderRadius: 10,
+    marginBottom: 16,
+    gap: 10,
   },
   infoText: {
     flex: 1,
-    fontSize: 14,
     fontWeight: '500',
     color: colors.primary,
-    lineHeight: 20,
+    lineHeight: 18,
   },
   section: {
-    marginBottom: 24,
   },
   label: {
-    fontSize: 16,
     fontWeight: '600',
     color: colors.text,
-    marginBottom: 8,
   },
   input: {
     backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
+    borderRadius: 10,
     color: colors.text,
     borderWidth: 1,
     borderColor: colors.border,
   },
   textArea: {
-    minHeight: 100,
-    paddingTop: 16,
+    paddingTop: 12,
   },
   helperText: {
-    fontSize: 12,
     color: colors.textSecondary,
-    marginTop: 6,
     fontStyle: 'italic',
   },
   dateButton: {
@@ -440,25 +443,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: colors.border,
   },
   dateButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
   },
   dateText: {
-    fontSize: 16,
     color: colors.text,
     fontWeight: '500',
   },
   datePickerContainer: {
-    marginTop: 12,
+    marginTop: 10,
     backgroundColor: colors.card,
-    borderRadius: 12,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: colors.border,
     overflow: 'hidden',
@@ -469,25 +470,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     backgroundColor: colors.card,
   },
   datePickerTitle: {
-    fontSize: 16,
     fontWeight: '600',
     color: colors.text,
   },
   doneButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
     backgroundColor: colors.primary,
-    borderRadius: 8,
+    borderRadius: 6,
   },
   doneButtonText: {
-    fontSize: 14,
     fontWeight: '600',
     color: '#FFFFFF',
   },
@@ -497,9 +492,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   categoryButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
+    borderRadius: 16,
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
@@ -509,7 +502,6 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
   },
   categoryText: {
-    fontSize: 14,
     fontWeight: '500',
     color: colors.text,
   },
@@ -518,51 +510,46 @@ const styles = StyleSheet.create({
   },
   photoButton: {
     backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 24,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: colors.primary,
     borderStyle: 'dashed',
-    gap: 12,
+    gap: 10,
   },
   photoButtonText: {
-    fontSize: 16,
     fontWeight: '600',
     color: colors.primary,
   },
   imageContainer: {
     position: 'relative',
-    borderRadius: 12,
+    borderRadius: 10,
     overflow: 'hidden',
   },
   image: {
     width: '100%',
-    height: 250,
-    borderRadius: 12,
+    borderRadius: 10,
     backgroundColor: colors.card,
   },
   removeImageButton: {
     position: 'absolute',
-    top: 12,
-    right: 12,
+    top: 10,
+    right: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 16,
+    borderRadius: 14,
     boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.2)',
     elevation: 4,
   },
   saveButton: {
     backgroundColor: colors.primary,
-    borderRadius: 12,
-    padding: 18,
+    borderRadius: 10,
     alignItems: 'center',
     marginTop: 8,
     boxShadow: '0px 4px 12px rgba(41, 171, 226, 0.3)',
     elevation: 4,
   },
   saveButtonText: {
-    fontSize: 18,
     fontWeight: '700',
     color: '#FFFFFF',
   },

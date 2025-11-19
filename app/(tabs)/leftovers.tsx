@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Platform,
   Alert,
+  useWindowDimensions,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
@@ -18,8 +19,16 @@ import * as Haptics from 'expo-haptics';
 
 export default function LeftoversScreen() {
   const router = useRouter();
+  const { width, height } = useWindowDimensions();
   const [leftovers, setLeftovers] = useState<Leftover[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Responsive sizing
+  const padding = width * 0.04;
+  const headerPadding = width * 0.05;
+  const fontSize = Math.min(width * 0.04, 16);
+  const titleSize = Math.min(width * 0.045, 17);
+  const iconSize = Math.min(width * 0.07, 28);
 
   const loadLeftovers = async () => {
     try {
@@ -110,29 +119,31 @@ export default function LeftoversScreen() {
     return (
       <React.Fragment key={index}>
         <TouchableOpacity
-          style={[styles.leftoverCard, { borderLeftColor: statusColor, borderLeftWidth: 4 }]}
+          style={[styles.leftoverCard, { borderLeftColor: statusColor, borderLeftWidth: 4, padding }]}
           onPress={() => handleLeftoverPress(leftover)}
           activeOpacity={0.7}
         >
           <View style={styles.cardContent}>
             <View style={styles.leftoverInfo}>
-              <View style={styles.iconContainer}>
+              <View style={[styles.iconContainer, { width: width * 0.12, height: width * 0.12, borderRadius: width * 0.06 }]}>
                 <IconSymbol
                   ios_icon_name="fork.knife"
                   android_material_icon_name="restaurant"
-                  size={32}
+                  size={iconSize}
                   color={colors.primary}
                 />
               </View>
               <View style={styles.textContainer}>
-                <Text style={styles.leftoverName} numberOfLines={1}>
+                <Text style={[styles.leftoverName, { fontSize: titleSize }]} numberOfLines={1}>
                   {leftover.name}
                 </Text>
-                <Text style={styles.leftoverDate}>
+                <Text style={[styles.leftoverDate, { fontSize: Math.min(width * 0.035, 13) }]}>
                   Added: {new Date(leftover.dateAdded).toLocaleDateString()}
                 </Text>
                 {leftover.category && (
-                  <Text style={styles.leftoverCategory}>{leftover.category}</Text>
+                  <Text style={[styles.leftoverCategory, { fontSize: Math.min(width * 0.032, 12) }]}>
+                    {leftover.category}
+                  </Text>
                 )}
               </View>
             </View>
@@ -140,10 +151,12 @@ export default function LeftoversScreen() {
               <IconSymbol
                 ios_icon_name={statusIcon === 'check-circle' ? 'checkmark.circle.fill' : statusIcon === 'warning' ? 'exclamationmark.triangle.fill' : 'xmark.circle.fill'}
                 android_material_icon_name={statusIcon}
-                size={24}
+                size={Math.min(width * 0.055, 22)}
                 color={statusColor}
               />
-              <Text style={[styles.statusText, { color: statusColor }]}>{statusText}</Text>
+              <Text style={[styles.statusText, { color: statusColor, fontSize: Math.min(width * 0.03, 11) }]}>
+                {statusText}
+              </Text>
             </View>
           </View>
           <TouchableOpacity
@@ -154,7 +167,7 @@ export default function LeftoversScreen() {
             <IconSymbol
               ios_icon_name="trash.fill"
               android_material_icon_name="delete"
-              size={20}
+              size={Math.min(width * 0.045, 18)}
               color={colors.danger}
             />
           </TouchableOpacity>
@@ -165,40 +178,40 @@ export default function LeftoversScreen() {
 
   return (
     <View style={commonStyles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Leftovers</Text>
-        <Text style={styles.headerSubtitle}>Track what&apos;s in your fridge</Text>
+      <View style={[styles.header, { paddingTop: Platform.OS === 'android' ? 48 : 16, paddingHorizontal: headerPadding, paddingBottom: height * 0.02 }]}>
+        <Text style={[styles.headerTitle, { fontSize: Math.min(width * 0.07, 28) }]}>My Leftovers</Text>
+        <Text style={[styles.headerSubtitle, { fontSize }]}>Track what&apos;s in your fridge</Text>
       </View>
 
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { padding, paddingBottom: 120 }]}
         showsVerticalScrollIndicator={false}
       >
         {leftovers.length > 0 && (
           <TouchableOpacity
-            style={styles.recipeSuggestionBanner}
+            style={[styles.recipeSuggestionBanner, { padding }]}
             onPress={handleRecipeSuggestions}
             activeOpacity={0.8}
           >
-            <View style={styles.bannerIcon}>
+            <View style={[styles.bannerIcon, { width: width * 0.11, height: width * 0.11, borderRadius: width * 0.055 }]}>
               <IconSymbol
                 ios_icon_name="lightbulb.fill"
                 android_material_icon_name="lightbulb"
-                size={28}
+                size={Math.min(width * 0.065, 26)}
                 color="#ffffff"
               />
             </View>
             <View style={styles.bannerText}>
-              <Text style={styles.bannerTitle}>Get Recipe Ideas!</Text>
-              <Text style={styles.bannerSubtitle}>
+              <Text style={[styles.bannerTitle, { fontSize }]}>Get Recipe Ideas!</Text>
+              <Text style={[styles.bannerSubtitle, { fontSize: Math.min(width * 0.033, 12) }]}>
                 See what you can make with your leftovers
               </Text>
             </View>
             <IconSymbol
               ios_icon_name="chevron.right"
               android_material_icon_name="chevron_right"
-              size={24}
+              size={Math.min(width * 0.055, 22)}
               color="#ffffff"
             />
           </TouchableOpacity>
@@ -206,18 +219,20 @@ export default function LeftoversScreen() {
 
         {loading ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>Loading...</Text>
+            <Text style={[styles.emptyText, { fontSize }]}>Loading...</Text>
           </View>
         ) : leftovers.length === 0 ? (
           <View style={styles.emptyContainer}>
             <IconSymbol
               ios_icon_name="refrigerator"
               android_material_icon_name="kitchen"
-              size={80}
+              size={Math.min(width * 0.18, 70)}
               color={colors.textSecondary}
             />
-            <Text style={styles.emptyTitle}>No leftovers yet</Text>
-            <Text style={styles.emptyText}>
+            <Text style={[styles.emptyTitle, { fontSize: Math.min(width * 0.055, 22), marginTop: height * 0.02 }]}>
+              No leftovers yet
+            </Text>
+            <Text style={[styles.emptyText, { fontSize }]}>
               Tap the + button below to add your first leftover
             </Text>
           </View>
@@ -228,11 +243,15 @@ export default function LeftoversScreen() {
         )}
       </ScrollView>
 
-      <TouchableOpacity style={styles.fab} onPress={handleAddLeftover} activeOpacity={0.8}>
+      <TouchableOpacity 
+        style={[styles.fab, { width: width * 0.14, height: width * 0.14, borderRadius: width * 0.07, bottom: 100, right: padding }]} 
+        onPress={handleAddLeftover} 
+        activeOpacity={0.8}
+      >
         <IconSymbol
           ios_icon_name="plus"
           android_material_icon_name="add"
-          size={28}
+          size={Math.min(width * 0.065, 26)}
           color="#ffffff"
         />
       </TouchableOpacity>
@@ -242,23 +261,18 @@ export default function LeftoversScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: Platform.OS === 'android' ? 48 : 16,
-    paddingHorizontal: 20,
-    paddingBottom: 16,
     backgroundColor: colors.card,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
     boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
     elevation: 3,
   },
   headerTitle: {
-    fontSize: 32,
     fontWeight: '800',
     color: colors.text,
     marginBottom: 4,
   },
   headerSubtitle: {
-    fontSize: 16,
     fontWeight: '400',
     color: colors.textSecondary,
   },
@@ -266,49 +280,40 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 120,
   },
   recipeSuggestionBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.primary,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: 12,
+    marginBottom: 12,
     boxShadow: '0px 4px 12px rgba(41, 171, 226, 0.3)',
     elevation: 4,
   },
   bannerIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   bannerText: {
     flex: 1,
   },
   bannerTitle: {
-    fontSize: 16,
     fontWeight: '700',
     color: '#ffffff',
     marginBottom: 2,
   },
   bannerSubtitle: {
-    fontSize: 13,
     fontWeight: '400',
     color: 'rgba(255, 255, 255, 0.9)',
   },
   listContainer: {
-    gap: 12,
+    gap: 10,
   },
   leftoverCard: {
     backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 12,
     boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
     elevation: 3,
     position: 'relative',
@@ -325,31 +330,25 @@ const styles = StyleSheet.create({
     marginRight: 40,
   },
   iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
     backgroundColor: colors.highlight,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   textContainer: {
     flex: 1,
   },
   leftoverName: {
-    fontSize: 18,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   leftoverDate: {
-    fontSize: 14,
     fontWeight: '400',
     color: colors.textSecondary,
     marginBottom: 2,
   },
   leftoverCategory: {
-    fontSize: 12,
     fontWeight: '500',
     color: colors.primary,
   },
@@ -358,14 +357,13 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   statusText: {
-    fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
   },
   deleteButton: {
     position: 'absolute',
-    top: 12,
-    right: 12,
+    top: 10,
+    right: 10,
     padding: 4,
   },
   emptyContainer: {
@@ -376,26 +374,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   emptyTitle: {
-    fontSize: 24,
     fontWeight: '700',
     color: colors.text,
-    marginTop: 16,
     marginBottom: 8,
   },
   emptyText: {
-    fontSize: 16,
     fontWeight: '400',
     color: colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 22,
   },
   fab: {
     position: 'absolute',
-    bottom: 100,
-    right: 20,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',

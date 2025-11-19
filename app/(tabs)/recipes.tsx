@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Platform,
   ActivityIndicator,
+  useWindowDimensions,
 } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
@@ -20,10 +21,18 @@ import * as Haptics from 'expo-haptics';
 
 export default function RecipesScreen() {
   const router = useRouter();
+  const { width, height } = useWindowDimensions();
   const [suggestions, setSuggestions] = useState<RecipeSuggestion[]>([]);
   const [leftovers, setLeftovers] = useState<Leftover[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRecipe, setSelectedRecipe] = useState<string | null>(null);
+
+  // Responsive sizing
+  const padding = width * 0.04;
+  const headerPadding = width * 0.05;
+  const fontSize = Math.min(width * 0.04, 16);
+  const titleSize = Math.min(width * 0.045, 17);
+  const iconSize = Math.min(width * 0.07, 28);
 
   const loadSuggestions = async () => {
     try {
@@ -60,7 +69,6 @@ export default function RecipesScreen() {
     if (success) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       
-      // Update the local state
       setSuggestions(prev =>
         prev.map(s =>
           s.id === recipeId ? { ...s, userRating: rating } : s
@@ -75,8 +83,10 @@ export default function RecipesScreen() {
     const ratings = [1, 2, 3, 4, 5];
     
     return (
-      <View style={styles.ratingContainer}>
-        <Text style={styles.ratingLabel}>Rate this recipe:</Text>
+      <View style={[styles.ratingContainer, { marginTop: height * 0.02, paddingTop: height * 0.02 }]}>
+        <Text style={[styles.ratingLabel, { fontSize: Math.min(width * 0.035, 13), marginBottom: height * 0.01 }]}>
+          Rate this recipe:
+        </Text>
         <View style={styles.starsContainer}>
           {ratings.map((rating, index) => (
             <React.Fragment key={index}>
@@ -91,7 +101,7 @@ export default function RecipesScreen() {
                       : 'fork.knife.circle'
                   }
                   android_material_icon_name="restaurant"
-                  size={32}
+                  size={Math.min(width * 0.07, 28)}
                   color={
                     recipe.userRating && rating <= recipe.userRating
                       ? colors.warning
@@ -112,7 +122,7 @@ export default function RecipesScreen() {
     return (
       <React.Fragment key={index}>
         <TouchableOpacity
-          style={styles.recipeCard}
+          style={[styles.recipeCard, { padding }]}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setSelectedRecipe(isExpanded ? null : recipe.id);
@@ -121,47 +131,53 @@ export default function RecipesScreen() {
         >
           <View style={styles.recipeHeader}>
             <View style={styles.recipeHeaderLeft}>
-              <View style={styles.iconContainer}>
+              <View style={[styles.iconContainer, { width: width * 0.12, height: width * 0.12, borderRadius: width * 0.06 }]}>
                 <IconSymbol
                   ios_icon_name="fork.knife"
                   android_material_icon_name="restaurant"
-                  size={32}
+                  size={iconSize}
                   color={colors.primary}
                 />
               </View>
               <View style={styles.recipeHeaderText}>
-                <Text style={styles.recipeName} numberOfLines={1}>
+                <Text style={[styles.recipeName, { fontSize: titleSize }]} numberOfLines={1}>
                   {recipe.name}
                 </Text>
-                <View style={styles.matchBadge}>
-                  <Text style={styles.matchScore}>{recipe.matchScore}% Match</Text>
+                <View style={[styles.matchBadge, { paddingHorizontal: width * 0.02, paddingVertical: height * 0.005 }]}>
+                  <Text style={[styles.matchScore, { fontSize: Math.min(width * 0.032, 12) }]}>
+                    {recipe.matchScore}% Match
+                  </Text>
                 </View>
               </View>
             </View>
             <IconSymbol
               ios_icon_name={isExpanded ? 'chevron.up' : 'chevron.down'}
               android_material_icon_name={isExpanded ? 'expand_less' : 'expand_more'}
-              size={24}
+              size={Math.min(width * 0.055, 22)}
               color={colors.textSecondary}
             />
           </View>
 
           {recipe.description && (
-            <Text style={styles.recipeDescription} numberOfLines={isExpanded ? undefined : 2}>
+            <Text style={[styles.recipeDescription, { fontSize: Math.min(width * 0.035, 13), marginBottom: height * 0.01 }]} numberOfLines={isExpanded ? undefined : 2}>
               {recipe.description}
             </Text>
           )}
 
           {isExpanded && (
-            <View style={styles.expandedContent}>
+            <View style={[styles.expandedContent, { marginTop: height * 0.015, paddingTop: height * 0.015 }]}>
               {recipe.matchedIngredients.length > 0 && (
-                <View style={styles.matchSection}>
-                  <Text style={styles.matchSectionTitle}>Matched Ingredients:</Text>
+                <View style={[styles.matchSection, { marginBottom: height * 0.015 }]}>
+                  <Text style={[styles.matchSectionTitle, { fontSize: Math.min(width * 0.035, 13), marginBottom: height * 0.01 }]}>
+                    Matched Ingredients:
+                  </Text>
                   <View style={styles.tagContainer}>
                     {recipe.matchedIngredients.map((ingredient, idx) => (
                       <React.Fragment key={idx}>
-                        <View style={styles.tag}>
-                          <Text style={styles.tagText}>{ingredient}</Text>
+                        <View style={[styles.tag, { paddingHorizontal: width * 0.03, paddingVertical: height * 0.008 }]}>
+                          <Text style={[styles.tagText, { fontSize: Math.min(width * 0.032, 12) }]}>
+                            {ingredient}
+                          </Text>
                         </View>
                       </React.Fragment>
                     ))}
@@ -170,13 +186,17 @@ export default function RecipesScreen() {
               )}
 
               {recipe.matchedCategories.length > 0 && (
-                <View style={styles.matchSection}>
-                  <Text style={styles.matchSectionTitle}>Matched Categories:</Text>
+                <View style={[styles.matchSection, { marginBottom: height * 0.015 }]}>
+                  <Text style={[styles.matchSectionTitle, { fontSize: Math.min(width * 0.035, 13), marginBottom: height * 0.01 }]}>
+                    Matched Categories:
+                  </Text>
                   <View style={styles.tagContainer}>
                     {recipe.matchedCategories.map((category, idx) => (
                       <React.Fragment key={idx}>
-                        <View style={[styles.tag, styles.categoryTag]}>
-                          <Text style={styles.tagText}>{category}</Text>
+                        <View style={[styles.tag, styles.categoryTag, { paddingHorizontal: width * 0.03, paddingVertical: height * 0.008 }]}>
+                          <Text style={[styles.tagText, { fontSize: Math.min(width * 0.032, 12) }]}>
+                            {category}
+                          </Text>
                         </View>
                       </React.Fragment>
                     ))}
@@ -185,33 +205,41 @@ export default function RecipesScreen() {
               )}
 
               {recipe.prep_time_minutes && (
-                <View style={styles.infoRow}>
+                <View style={[styles.infoRow, { marginBottom: height * 0.01 }]}>
                   <IconSymbol
                     ios_icon_name="clock"
                     android_material_icon_name="schedule"
-                    size={16}
+                    size={Math.min(width * 0.04, 16)}
                     color={colors.textSecondary}
                   />
-                  <Text style={styles.infoText}>{recipe.prep_time_minutes} minutes</Text>
+                  <Text style={[styles.infoText, { fontSize: Math.min(width * 0.035, 13) }]}>
+                    {recipe.prep_time_minutes} minutes
+                  </Text>
                 </View>
               )}
 
               {recipe.difficulty && (
-                <View style={styles.infoRow}>
+                <View style={[styles.infoRow, { marginBottom: height * 0.01 }]}>
                   <IconSymbol
                     ios_icon_name="chart.bar"
                     android_material_icon_name="bar_chart"
-                    size={16}
+                    size={Math.min(width * 0.04, 16)}
                     color={colors.textSecondary}
                   />
-                  <Text style={styles.infoText}>{recipe.difficulty}</Text>
+                  <Text style={[styles.infoText, { fontSize: Math.min(width * 0.035, 13) }]}>
+                    {recipe.difficulty}
+                  </Text>
                 </View>
               )}
 
               {recipe.instructions && (
-                <View style={styles.instructionsSection}>
-                  <Text style={styles.instructionsTitle}>Instructions:</Text>
-                  <Text style={styles.instructionsText}>{recipe.instructions}</Text>
+                <View style={[styles.instructionsSection, { marginTop: height * 0.015, marginBottom: height * 0.02 }]}>
+                  <Text style={[styles.instructionsTitle, { fontSize: Math.min(width * 0.035, 13), marginBottom: height * 0.01 }]}>
+                    Instructions:
+                  </Text>
+                  <Text style={[styles.instructionsText, { fontSize: Math.min(width * 0.035, 13) }]}>
+                    {recipe.instructions}
+                  </Text>
                 </View>
               )}
 
@@ -225,43 +253,45 @@ export default function RecipesScreen() {
 
   return (
     <View style={commonStyles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Recipe Suggestions</Text>
-        <Text style={styles.headerSubtitle}>
+      <View style={[styles.header, { paddingTop: Platform.OS === 'android' ? 48 : 16, paddingHorizontal: headerPadding, paddingBottom: height * 0.02 }]}>
+        <Text style={[styles.headerTitle, { fontSize: Math.min(width * 0.07, 28) }]}>Recipe Suggestions</Text>
+        <Text style={[styles.headerSubtitle, { fontSize }]}>
           Based on your {leftovers.length} leftover{leftovers.length !== 1 ? 's' : ''}
         </Text>
       </View>
 
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { padding, paddingBottom: 120 }]}
         showsVerticalScrollIndicator={false}
       >
         {loading ? (
           <View style={styles.emptyContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={styles.emptyText}>Finding recipes...</Text>
+            <Text style={[styles.emptyText, { fontSize, marginTop: height * 0.02 }]}>Finding recipes...</Text>
           </View>
         ) : leftovers.length === 0 ? (
           <View style={styles.emptyContainer}>
             <IconSymbol
               ios_icon_name="refrigerator"
               android_material_icon_name="kitchen"
-              size={80}
+              size={Math.min(width * 0.18, 70)}
               color={colors.textSecondary}
             />
-            <Text style={styles.emptyTitle}>No leftovers yet</Text>
-            <Text style={styles.emptyText}>
+            <Text style={[styles.emptyTitle, { fontSize: Math.min(width * 0.055, 22), marginTop: height * 0.02 }]}>
+              No leftovers yet
+            </Text>
+            <Text style={[styles.emptyText, { fontSize }]}>
               Add some leftovers first to get recipe suggestions
             </Text>
             <TouchableOpacity
-              style={styles.addButton}
+              style={[styles.addButton, { marginTop: height * 0.025, paddingHorizontal: width * 0.06, paddingVertical: height * 0.015 }]}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 router.push('/(tabs)/leftovers');
               }}
             >
-              <Text style={styles.addButtonText}>Go to Leftovers</Text>
+              <Text style={[styles.addButtonText, { fontSize }]}>Go to Leftovers</Text>
             </TouchableOpacity>
           </View>
         ) : suggestions.length === 0 ? (
@@ -269,17 +299,19 @@ export default function RecipesScreen() {
             <IconSymbol
               ios_icon_name="magnifyingglass"
               android_material_icon_name="search"
-              size={80}
+              size={Math.min(width * 0.18, 70)}
               color={colors.textSecondary}
             />
-            <Text style={styles.emptyTitle}>No matches found</Text>
-            <Text style={styles.emptyText}>
+            <Text style={[styles.emptyTitle, { fontSize: Math.min(width * 0.055, 22), marginTop: height * 0.02 }]}>
+              No matches found
+            </Text>
+            <Text style={[styles.emptyText, { fontSize }]}>
               We couldn&apos;t find any recipes matching your current leftovers
             </Text>
           </View>
         ) : (
           <View style={styles.listContainer}>
-            <Text style={styles.resultsText}>
+            <Text style={[styles.resultsText, { fontSize: Math.min(width * 0.035, 13), marginBottom: height * 0.01 }]}>
               Found {suggestions.length} recipe{suggestions.length !== 1 ? 's' : ''}
             </Text>
             {suggestions.map((recipe, index) => renderRecipeCard(recipe, index))}
@@ -292,23 +324,18 @@ export default function RecipesScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: Platform.OS === 'android' ? 48 : 16,
-    paddingHorizontal: 20,
-    paddingBottom: 16,
     backgroundColor: colors.card,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
     boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
     elevation: 3,
   },
   headerTitle: {
-    fontSize: 32,
     fontWeight: '800',
     color: colors.text,
     marginBottom: 4,
   },
   headerSubtitle: {
-    fontSize: 16,
     fontWeight: '400',
     color: colors.textSecondary,
   },
@@ -316,22 +343,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 120,
   },
   listContainer: {
-    gap: 12,
+    gap: 10,
   },
   resultsText: {
-    fontSize: 14,
     fontWeight: '600',
     color: colors.textSecondary,
-    marginBottom: 8,
   },
   recipeCard: {
     backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 12,
     boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
     elevation: 3,
   },
@@ -339,127 +361,99 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   recipeHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    marginRight: 12,
+    marginRight: 10,
   },
   iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
     backgroundColor: colors.highlight,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   recipeHeaderText: {
     flex: 1,
   },
   recipeName: {
-    fontSize: 18,
     fontWeight: '700',
     color: colors.text,
     marginBottom: 4,
   },
   matchBadge: {
     backgroundColor: colors.success + '20',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 6,
     alignSelf: 'flex-start',
   },
   matchScore: {
-    fontSize: 12,
     fontWeight: '600',
     color: colors.success,
   },
   recipeDescription: {
-    fontSize: 14,
     fontWeight: '400',
     color: colors.textSecondary,
-    lineHeight: 20,
-    marginBottom: 8,
+    lineHeight: 18,
   },
   expandedContent: {
-    marginTop: 12,
-    paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
   matchSection: {
-    marginBottom: 12,
   },
   matchSectionTitle: {
-    fontSize: 14,
     fontWeight: '600',
     color: colors.text,
-    marginBottom: 8,
   },
   tagContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 6,
   },
   tag: {
     backgroundColor: colors.primary + '20',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 10,
   },
   categoryTag: {
     backgroundColor: colors.warning + '20',
   },
   tagText: {
-    fontSize: 12,
     fontWeight: '500',
     color: colors.text,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
+    gap: 6,
   },
   infoText: {
-    fontSize: 14,
     fontWeight: '400',
     color: colors.textSecondary,
   },
   instructionsSection: {
-    marginTop: 12,
-    marginBottom: 16,
   },
   instructionsTitle: {
-    fontSize: 14,
     fontWeight: '600',
     color: colors.text,
-    marginBottom: 8,
   },
   instructionsText: {
-    fontSize: 14,
     fontWeight: '400',
     color: colors.textSecondary,
-    lineHeight: 20,
+    lineHeight: 18,
   },
   ratingContainer: {
-    marginTop: 16,
-    paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
   ratingLabel: {
-    fontSize: 14,
     fontWeight: '600',
     color: colors.text,
-    marginBottom: 8,
   },
   starsContainer: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
   },
   emptyContainer: {
     flex: 1,
@@ -469,28 +463,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   emptyTitle: {
-    fontSize: 24,
     fontWeight: '700',
     color: colors.text,
-    marginTop: 16,
     marginBottom: 8,
   },
   emptyText: {
-    fontSize: 16,
     fontWeight: '400',
     color: colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 22,
   },
   addButton: {
-    marginTop: 20,
     backgroundColor: colors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 10,
   },
   addButtonText: {
-    fontSize: 16,
     fontWeight: '600',
     color: '#ffffff',
   },

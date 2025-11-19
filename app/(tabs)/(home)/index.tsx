@@ -1,6 +1,6 @@
 
 import React from "react";
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, useWindowDimensions } from "react-native";
 import { useRouter } from "expo-router";
 import { IconSymbol } from "@/components/IconSymbol";
 import { colors, commonStyles } from "@/styles/commonStyles";
@@ -8,6 +8,13 @@ import * as Haptics from "expo-haptics";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { width, height } = useWindowDimensions();
+  
+  // Calculate responsive sizes based on screen dimensions
+  const scale = Math.min(width / 375, 1.2); // Base on iPhone SE width, max scale 1.2
+  const iconSize = Math.min(width * 0.18, 70);
+  const heroTitleSize = Math.min(width * 0.08, 32);
+  const heroSubtitleSize = Math.min(width * 0.045, 16);
 
   const handleNavigateToLeftovers = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -22,160 +29,170 @@ export default function HomeScreen() {
   return (
     <View style={[commonStyles.container]}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingHorizontal: width * 0.05 }]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.heroSection}>
+        <View style={[styles.heroSection, { paddingVertical: height * 0.03 }]}>
           <IconSymbol
             ios_icon_name="refrigerator"
             android_material_icon_name="kitchen"
-            size={80}
+            size={iconSize}
             color={colors.primary}
           />
-          <Text style={styles.heroTitle}>Leftover Tracker</Text>
-          <Text style={styles.heroSubtitle}>
+          <Text style={[styles.heroTitle, { fontSize: heroTitleSize, marginTop: height * 0.015 }]}>
+            Leftover Tracker
+          </Text>
+          <Text style={[styles.heroSubtitle, { fontSize: heroSubtitleSize, paddingHorizontal: width * 0.05 }]}>
             Never waste food again! Track what&apos;s in your fridge and get recipe ideas.
           </Text>
         </View>
 
         <TouchableOpacity
-          style={styles.featureCard}
+          style={[styles.featureCard, { padding: width * 0.04 }]}
           onPress={handleNavigateToLeftovers}
           activeOpacity={0.7}
         >
-          <View style={styles.featureIconContainer}>
+          <View style={[styles.featureIconContainer, { width: width * 0.12, height: width * 0.12, borderRadius: width * 0.06 }]}>
             <IconSymbol
               ios_icon_name="list.bullet"
               android_material_icon_name="list"
-              size={32}
+              size={Math.min(width * 0.07, 28)}
               color={colors.primary}
             />
           </View>
           <View style={styles.featureContent}>
-            <Text style={styles.featureTitle}>Track Your Leftovers</Text>
-            <Text style={styles.featureDescription}>
+            <Text style={[styles.featureTitle, { fontSize: Math.min(width * 0.045, 17) }]}>
+              Track Your Leftovers
+            </Text>
+            <Text style={[styles.featureDescription, { fontSize: Math.min(width * 0.035, 13) }]}>
               Add items to your fridge and see how many days they have left
             </Text>
           </View>
           <IconSymbol
             ios_icon_name="chevron.right"
             android_material_icon_name="chevron_right"
-            size={24}
+            size={Math.min(width * 0.055, 22)}
             color={colors.textSecondary}
           />
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.featureCard, styles.recipeCard]}
+          style={[styles.featureCard, styles.recipeCard, { padding: width * 0.04 }]}
           onPress={handleNavigateToRecipes}
           activeOpacity={0.7}
         >
-          <View style={[styles.featureIconContainer, styles.recipeIconContainer]}>
+          <View style={[styles.featureIconContainer, styles.recipeIconContainer, { width: width * 0.12, height: width * 0.12, borderRadius: width * 0.06 }]}>
             <IconSymbol
               ios_icon_name="lightbulb.fill"
               android_material_icon_name="lightbulb"
-              size={32}
+              size={Math.min(width * 0.07, 28)}
               color="#ffffff"
             />
           </View>
           <View style={styles.featureContent}>
-            <Text style={[styles.featureTitle, styles.recipeTitle]}>Get Recipe Ideas</Text>
-            <Text style={[styles.featureDescription, styles.recipeDescription]}>
+            <Text style={[styles.featureTitle, styles.recipeTitle, { fontSize: Math.min(width * 0.045, 17) }]}>
+              Get Recipe Ideas
+            </Text>
+            <Text style={[styles.featureDescription, styles.recipeDescription, { fontSize: Math.min(width * 0.035, 13) }]}>
               Discover recipes based on your leftovers and rate them
             </Text>
           </View>
           <IconSymbol
             ios_icon_name="chevron.right"
             android_material_icon_name="chevron_right"
-            size={24}
+            size={Math.min(width * 0.055, 22)}
             color="#ffffff"
           />
         </TouchableOpacity>
 
-        <View style={styles.infoSection}>
-          <Text style={styles.sectionTitle}>How It Works</Text>
+        <View style={[styles.infoSection, { marginBottom: height * 0.025 }]}>
+          <Text style={[styles.sectionTitle, { fontSize: Math.min(width * 0.055, 22), marginBottom: height * 0.015 }]}>
+            How It Works
+          </Text>
           
-          <View style={styles.stepCard}>
-            <View style={styles.stepNumber}>
-              <Text style={styles.stepNumberText}>1</Text>
+          <View style={[styles.stepCard, { padding: width * 0.035 }]}>
+            <View style={[styles.stepNumber, { width: width * 0.09, height: width * 0.09, borderRadius: width * 0.045 }]}>
+              <Text style={[styles.stepNumberText, { fontSize: Math.min(width * 0.045, 18) }]}>1</Text>
             </View>
             <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Add Leftovers</Text>
-              <Text style={styles.stepDescription}>
+              <Text style={[styles.stepTitle, { fontSize: Math.min(width * 0.04, 15) }]}>Add Leftovers</Text>
+              <Text style={[styles.stepDescription, { fontSize: Math.min(width * 0.035, 13) }]}>
                 Tap the + button to add items when you put them in the fridge
               </Text>
             </View>
           </View>
 
-          <View style={styles.stepCard}>
-            <View style={styles.stepNumber}>
-              <Text style={styles.stepNumberText}>2</Text>
+          <View style={[styles.stepCard, { padding: width * 0.035 }]}>
+            <View style={[styles.stepNumber, { width: width * 0.09, height: width * 0.09, borderRadius: width * 0.045 }]}>
+              <Text style={[styles.stepNumberText, { fontSize: Math.min(width * 0.045, 18) }]}>2</Text>
             </View>
             <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Track Freshness</Text>
-              <Text style={styles.stepDescription}>
+              <Text style={[styles.stepTitle, { fontSize: Math.min(width * 0.04, 15) }]}>Track Freshness</Text>
+              <Text style={[styles.stepDescription, { fontSize: Math.min(width * 0.035, 13) }]}>
                 See at a glance how many days each item has left
               </Text>
             </View>
           </View>
 
-          <View style={styles.stepCard}>
-            <View style={styles.stepNumber}>
-              <Text style={styles.stepNumberText}>3</Text>
+          <View style={[styles.stepCard, { padding: width * 0.035 }]}>
+            <View style={[styles.stepNumber, { width: width * 0.09, height: width * 0.09, borderRadius: width * 0.045 }]}>
+              <Text style={[styles.stepNumberText, { fontSize: Math.min(width * 0.045, 18) }]}>3</Text>
             </View>
             <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Get Recipe Ideas</Text>
-              <Text style={styles.stepDescription}>
+              <Text style={[styles.stepTitle, { fontSize: Math.min(width * 0.04, 15) }]}>Get Recipe Ideas</Text>
+              <Text style={[styles.stepDescription, { fontSize: Math.min(width * 0.035, 13) }]}>
                 Browse recipe suggestions that match your leftovers and rate them
               </Text>
             </View>
           </View>
 
-          <View style={styles.stepCard}>
-            <View style={styles.stepNumber}>
-              <Text style={styles.stepNumberText}>4</Text>
+          <View style={[styles.stepCard, { padding: width * 0.035 }]}>
+            <View style={[styles.stepNumber, { width: width * 0.09, height: width * 0.09, borderRadius: width * 0.045 }]}>
+              <Text style={[styles.stepNumberText, { fontSize: Math.min(width * 0.045, 18) }]}>4</Text>
             </View>
             <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>Reduce Waste</Text>
-              <Text style={styles.stepDescription}>
+              <Text style={[styles.stepTitle, { fontSize: Math.min(width * 0.04, 15) }]}>Reduce Waste</Text>
+              <Text style={[styles.stepDescription, { fontSize: Math.min(width * 0.035, 13) }]}>
                 Get notified when items are about to expire so you can use them in time
               </Text>
             </View>
           </View>
         </View>
 
-        <View style={styles.tipsSection}>
-          <Text style={styles.sectionTitle}>Food Safety Tips</Text>
-          <View style={styles.tipCard}>
+        <View style={[styles.tipsSection, { marginBottom: height * 0.025 }]}>
+          <Text style={[styles.sectionTitle, { fontSize: Math.min(width * 0.055, 22), marginBottom: height * 0.015 }]}>
+            Food Safety Tips
+          </Text>
+          <View style={[styles.tipCard, { padding: width * 0.035 }]}>
             <IconSymbol
               ios_icon_name="thermometer"
               android_material_icon_name="thermostat"
-              size={24}
+              size={Math.min(width * 0.055, 22)}
               color={colors.secondary}
             />
-            <Text style={styles.tipText}>
+            <Text style={[styles.tipText, { fontSize: Math.min(width * 0.037, 14) }]}>
               Keep your fridge at 40°F (4°C) or below
             </Text>
           </View>
-          <View style={styles.tipCard}>
+          <View style={[styles.tipCard, { padding: width * 0.035 }]}>
             <IconSymbol
               ios_icon_name="clock.fill"
               android_material_icon_name="schedule"
-              size={24}
+              size={Math.min(width * 0.055, 22)}
               color={colors.secondary}
             />
-            <Text style={styles.tipText}>
+            <Text style={[styles.tipText, { fontSize: Math.min(width * 0.037, 14) }]}>
               Most leftovers are safe for 3-4 days
             </Text>
           </View>
-          <View style={styles.tipCard}>
+          <View style={[styles.tipCard, { padding: width * 0.035 }]}>
             <IconSymbol
               ios_icon_name="exclamationmark.triangle.fill"
               android_material_icon_name="warning"
-              size={24}
+              size={Math.min(width * 0.055, 22)}
               color={colors.warning}
             />
-            <Text style={styles.tipText}>
+            <Text style={[styles.tipText, { fontSize: Math.min(width * 0.037, 14) }]}>
               When in doubt, throw it out!
             </Text>
           </View>
@@ -187,52 +204,42 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   scrollContent: {
-    paddingTop: 48,
-    paddingHorizontal: 20,
+    paddingTop: 24,
     paddingBottom: 120,
   },
   heroSection: {
     alignItems: 'center',
-    paddingVertical: 40,
   },
   heroTitle: {
-    fontSize: 36,
     fontWeight: '800',
     color: colors.text,
-    marginTop: 20,
-    marginBottom: 12,
+    marginBottom: 8,
     textAlign: 'center',
   },
   heroSubtitle: {
-    fontSize: 18,
     fontWeight: '400',
     color: colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 26,
-    paddingHorizontal: 20,
+    lineHeight: 22,
   },
   featureCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
+    borderRadius: 12,
+    marginBottom: 12,
     boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
     elevation: 3,
   },
   recipeCard: {
     backgroundColor: colors.primary,
-    marginBottom: 32,
+    marginBottom: 20,
   },
   featureIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
     backgroundColor: colors.highlight,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 12,
   },
   recipeIconContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -241,52 +248,42 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   featureTitle: {
-    fontSize: 18,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   recipeTitle: {
     color: '#ffffff',
   },
   featureDescription: {
-    fontSize: 14,
     fontWeight: '400',
     color: colors.textSecondary,
-    lineHeight: 20,
+    lineHeight: 18,
   },
   recipeDescription: {
     color: 'rgba(255, 255, 255, 0.9)',
   },
   infoSection: {
-    marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: 24,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: 16,
   },
   stepCard: {
     flexDirection: 'row',
     backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: 12,
+    marginBottom: 10,
     boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
     elevation: 3,
   },
   stepNumber: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 12,
   },
   stepNumberText: {
-    fontSize: 20,
     fontWeight: '800',
     color: '#ffffff',
   },
@@ -294,36 +291,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   stepTitle: {
-    fontSize: 16,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   stepDescription: {
-    fontSize: 14,
     fontWeight: '400',
     color: colors.textSecondary,
-    lineHeight: 20,
+    lineHeight: 18,
   },
   tipsSection: {
-    marginBottom: 32,
   },
   tipCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    gap: 12,
+    borderRadius: 10,
+    marginBottom: 10,
+    gap: 10,
     boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
     elevation: 3,
   },
   tipText: {
     flex: 1,
-    fontSize: 15,
     fontWeight: '500',
     color: colors.text,
-    lineHeight: 22,
+    lineHeight: 20,
   },
 });
