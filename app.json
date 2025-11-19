@@ -1,7 +1,8 @@
+
 {
   "expo": {
     "name": "Leftover Tracker",
-    "slug": "Leftover Tracker",
+    "slug": "leftover-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
@@ -20,19 +21,7 @@
         "NSCameraUsageDescription": "This app uses the camera to take photos of your leftovers.",
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select photos of your leftovers."
       },
-      "usesIcloudStorage": true,
-      "entitlements": {
-        "com.apple.developer.icloud-container-identifiers": [
-          "iCloud.$(CFBundleIdentifier)"
-        ],
-        "com.apple.developer.ubiquity-container-identifiers": [
-          "iCloud.$(CFBundleIdentifier)"
-        ],
-        "com.apple.developer.icloud-services": [
-          "CloudDocuments"
-        ],
-        "com.apple.developer.ubiquity-kvstore-identifier": "$(TeamIdentifierPrefix)$(CFBundleIdentifier)"
-      }
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
@@ -41,6 +30,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.leftoversentry.app",
+      "versionCode": 1,
       "permissions": [
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
@@ -79,8 +69,10 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {}
+      "router": {},
+      "eas": {
+        "projectId": "your-project-id-here"
+      }
     }
-  },
-  "scheme": "Leftover Tracker"
+  }
 }
