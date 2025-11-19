@@ -2,7 +2,7 @@
 {
   "expo": {
     "name": "Leftover Sentry",
-    "slug": "Leftover Sentry",
+    "slug": "leftover-sentry",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
@@ -15,9 +15,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.Natively",
+      "bundleIdentifier": "com.leftoversentry.app",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "This app uses the camera to take photos of your leftovers.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select photos of your leftovers."
       },
       "usesIcloudStorage": true,
       "entitlements": {
@@ -39,7 +41,15 @@
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.Natively"
+      "package": "com.leftoversentry.app",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "RECEIVE_BOOT_COMPLETED",
+        "SCHEDULE_EXACT_ALARM",
+        "USE_EXACT_ALARM"
+      ]
     },
     "web": {
       "favicon": "./assets/images/final_quest_240x240.png",
@@ -48,15 +58,32 @@
     "plugins": [
       "expo-font",
       "expo-router",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/natively-dark.png",
+          "color": "#000000",
+          "sounds": []
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app needs access to your photos to let you select images of your leftovers.",
+          "cameraPermission": "The app needs access to your camera to let you take photos of your leftovers."
+        }
+      ]
     ],
-    "scheme": "natively",
+    "scheme": "leftoversentry",
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
-      "router": {}
+      "router": {},
+      "eas": {
+        "projectId": "your-project-id-here"
+      }
     }
-  },
-  "scheme": "Leftover Sentry"
+  }
 }
