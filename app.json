@@ -1,8 +1,7 @@
-
 {
   "expo": {
     "name": "Leftover Tracker",
-    "slug": "leftover-tracker",
+    "slug": "Leftover Tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
@@ -82,5 +81,6 @@
     "extra": {
       "router": {}
     }
-  }
+  },
+  "scheme": "Leftover Tracker"
 }
