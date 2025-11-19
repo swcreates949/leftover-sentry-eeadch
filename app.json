@@ -1,8 +1,8 @@
 
 {
   "expo": {
-    "name": "Leftover Sentry",
-    "slug": "leftover-sentry",
+    "name": "Leftover Tracker",
+    "slug": "leftover-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
@@ -80,10 +80,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "your-project-id-here"
-      }
+      "router": {}
     }
   }
 }
