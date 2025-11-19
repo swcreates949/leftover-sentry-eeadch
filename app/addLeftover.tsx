@@ -62,10 +62,20 @@ export default function AddLeftoverScreen() {
   };
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(Platform.OS === 'ios');
+    // On Android, the picker closes automatically after selection
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    
     if (selectedDate) {
       setDateAdded(selectedDate);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
+  };
+
+  const toggleDatePicker = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowDatePicker(!showDatePicker);
   };
 
   const handleCategorySelect = (selectedCategory: string) => {
@@ -159,6 +169,16 @@ export default function AddLeftoverScreen() {
     }
   };
 
+  const formatDateDisplay = (date: Date): string => {
+    const options: Intl.DateTimeFormatOptions = { 
+      weekday: 'short', 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    };
+    return date.toLocaleDateString(undefined, options);
+  };
+
   return (
     <View style={commonStyles.container}>
       <ScrollView
@@ -230,24 +250,48 @@ export default function AddLeftoverScreen() {
           <Text style={styles.label}>Date Added *</Text>
           <TouchableOpacity
             style={styles.dateButton}
-            onPress={() => setShowDatePicker(true)}
+            onPress={toggleDatePicker}
+            activeOpacity={0.8}
           >
+            <View style={styles.dateButtonContent}>
+              <IconSymbol
+                ios_icon_name="calendar"
+                android_material_icon_name="calendar_today"
+                size={20}
+                color={colors.primary}
+              />
+              <Text style={styles.dateText}>{formatDateDisplay(dateAdded)}</Text>
+            </View>
             <IconSymbol
-              ios_icon_name="calendar"
-              android_material_icon_name="calendar_today"
+              ios_icon_name={showDatePicker ? "chevron.up" : "chevron.down"}
+              android_material_icon_name={showDatePicker ? "expand_less" : "expand_more"}
               size={20}
-              color={colors.primary}
+              color={colors.textSecondary}
             />
-            <Text style={styles.dateText}>{dateAdded.toLocaleDateString()}</Text>
           </TouchableOpacity>
+          
           {showDatePicker && (
-            <DateTimePicker
-              value={dateAdded}
-              mode="date"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={handleDateChange}
-              maximumDate={new Date()}
-            />
+            <View style={styles.datePickerContainer}>
+              <View style={styles.datePickerHeader}>
+                <Text style={styles.datePickerTitle}>Select Date</Text>
+                {Platform.OS === 'ios' && (
+                  <TouchableOpacity
+                    onPress={() => setShowDatePicker(false)}
+                    style={styles.doneButton}
+                  >
+                    <Text style={styles.doneButtonText}>Done</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              <DateTimePicker
+                value={dateAdded}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                onChange={handleDateChange}
+                maximumDate={new Date()}
+                style={styles.datePicker}
+              />
+            </View>
           )}
         </View>
 
@@ -373,17 +417,61 @@ const styles = StyleSheet.create({
   dateButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: colors.card,
     borderRadius: 12,
     padding: 16,
-    gap: 12,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  dateButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   dateText: {
     fontSize: 16,
     color: colors.text,
     fontWeight: '500',
+  },
+  datePickerContainer: {
+    marginTop: 12,
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+    elevation: 4,
+  },
+  datePickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  datePickerTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  doneButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    backgroundColor: colors.primary,
+    borderRadius: 8,
+  },
+  doneButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  datePicker: {
+    width: '100%',
+    backgroundColor: colors.card,
   },
   categoryGrid: {
     flexDirection: 'row',
