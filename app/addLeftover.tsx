@@ -62,20 +62,33 @@ export default function AddLeftoverScreen() {
   };
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
-    // On Android, the picker closes automatically after selection
+    console.log('Date change event:', event.type, selectedDate);
+    
+    // Handle Android dismissal
     if (Platform.OS === 'android') {
       setShowDatePicker(false);
-    }
-    
-    if (selectedDate) {
-      setDateAdded(selectedDate);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      
+      // Only update date if user didn't dismiss
+      if (event.type === 'set' && selectedDate) {
+        setDateAdded(selectedDate);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+    } else {
+      // iOS - update date immediately as user scrolls
+      if (selectedDate) {
+        setDateAdded(selectedDate);
+      }
     }
   };
 
   const toggleDatePicker = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePicker(!showDatePicker);
+  };
+
+  const closeDatePicker = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowDatePicker(false);
   };
 
   const handleCategorySelect = (selectedCategory: string) => {
@@ -270,28 +283,36 @@ export default function AddLeftoverScreen() {
             />
           </TouchableOpacity>
           
-          {showDatePicker && (
+          {showDatePicker && Platform.OS === 'ios' && (
             <View style={styles.datePickerContainer}>
               <View style={styles.datePickerHeader}>
                 <Text style={styles.datePickerTitle}>Select Date</Text>
-                {Platform.OS === 'ios' && (
-                  <TouchableOpacity
-                    onPress={() => setShowDatePicker(false)}
-                    style={styles.doneButton}
-                  >
-                    <Text style={styles.doneButtonText}>Done</Text>
-                  </TouchableOpacity>
-                )}
+                <TouchableOpacity
+                  onPress={closeDatePicker}
+                  style={styles.doneButton}
+                >
+                  <Text style={styles.doneButtonText}>Done</Text>
+                </TouchableOpacity>
               </View>
               <DateTimePicker
                 value={dateAdded}
                 mode="date"
-                display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                display="inline"
                 onChange={handleDateChange}
                 maximumDate={new Date()}
-                style={styles.datePicker}
+                themeVariant="light"
               />
             </View>
+          )}
+          
+          {showDatePicker && Platform.OS === 'android' && (
+            <DateTimePicker
+              value={dateAdded}
+              mode="date"
+              display="calendar"
+              onChange={handleDateChange}
+              maximumDate={new Date()}
+            />
           )}
         </View>
 
@@ -452,6 +473,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    backgroundColor: colors.card,
   },
   datePickerTitle: {
     fontSize: 16,
@@ -468,10 +490,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#FFFFFF',
-  },
-  datePicker: {
-    width: '100%',
-    backgroundColor: colors.card,
   },
   categoryGrid: {
     flexDirection: 'row',
