@@ -1,9 +1,11 @@
+
 import React from "react";
 import { View, Text, StyleSheet, ScrollView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { IconSymbol } from "@/components/IconSymbol";
 import { GlassView } from "expo-glass-effect";
 import { useTheme } from "@react-navigation/native";
+import { SyncStatus } from "@/components/SyncStatus";
 
 export default function ProfileScreen() {
   const theme = useTheme();
@@ -22,21 +24,28 @@ export default function ProfileScreen() {
           Platform.OS !== 'ios' && { backgroundColor: theme.dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }
         ]} glassEffectStyle="regular">
           <IconSymbol ios_icon_name="person.circle.fill" android_material_icon_name="person" size={80} color={theme.colors.primary} />
-          <Text style={[styles.name, { color: theme.colors.text }]}>John Doe</Text>
-          <Text style={[styles.email, { color: theme.dark ? '#98989D' : '#666' }]}>john.doe@example.com</Text>
+          <Text style={[styles.name, { color: theme.colors.text }]}>Leftover Tracker</Text>
+          <Text style={[styles.email, { color: theme.dark ? '#98989D' : '#666' }]}>Keep your fridge organized</Text>
         </GlassView>
+
+        <SyncStatus />
 
         <GlassView style={[
           styles.section,
           Platform.OS !== 'ios' && { backgroundColor: theme.dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }
         ]} glassEffectStyle="regular">
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>About</Text>
           <View style={styles.infoRow}>
-            <IconSymbol ios_icon_name="phone.fill" android_material_icon_name="phone" size={20} color={theme.dark ? '#98989D' : '#666'} />
-            <Text style={[styles.infoText, { color: theme.colors.text }]}>+1 (555) 123-4567</Text>
+            <IconSymbol ios_icon_name="info.circle" android_material_icon_name="info" size={20} color={theme.dark ? '#98989D' : '#666'} />
+            <Text style={[styles.infoText, { color: theme.colors.text }]}>Track your leftovers and reduce food waste</Text>
           </View>
           <View style={styles.infoRow}>
-            <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location-on" size={20} color={theme.dark ? '#98989D' : '#666'} />
-            <Text style={[styles.infoText, { color: theme.colors.text }]}>San Francisco, CA</Text>
+            <IconSymbol ios_icon_name="bell.fill" android_material_icon_name="notifications" size={20} color={theme.dark ? '#98989D' : '#666'} />
+            <Text style={[styles.infoText, { color: theme.colors.text }]}>Get notified when items expire</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <IconSymbol ios_icon_name="camera.fill" android_material_icon_name="camera" size={20} color={theme.dark ? '#98989D' : '#666'} />
+            <Text style={[styles.infoText, { color: theme.colors.text }]}>Take photos of your leftovers</Text>
           </View>
         </GlassView>
       </ScrollView>
@@ -78,6 +87,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     gap: 12,
+    marginTop: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 8,
   },
   infoRow: {
     flexDirection: 'row',
@@ -86,6 +101,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 16,
+    flex: 1,
     // color handled dynamically
   },
 });

@@ -17,21 +17,16 @@ import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useNetworkState } from 'expo-network';
 import * as Notifications from 'expo-notifications';
+import { useAppStateSync } from '@/hooks/useAppStateSync';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayoutContent() {
   const networkState = useNetworkState();
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+  // Enable automatic iCloud sync when app comes to foreground
+  useAppStateSync();
 
   // Set up notification listeners
   useEffect(() => {
@@ -56,10 +51,6 @@ export default function RootLayout() {
       responseListener.remove();
     };
   }, []);
-
-  if (!loaded) {
-    return null;
-  }
 
   const customDarkTheme: Theme = {
     ...DarkTheme,
@@ -88,52 +79,72 @@ export default function RootLayout() {
   };
 
   return (
+    <ThemeProvider
+      value={colorScheme === 'dark' ? customDarkTheme : customLightTheme}
+    >
+      <SystemBars style={colorScheme === 'dark' ? 'light' : 'dark'} />
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="modal"
+          options={{
+            presentation: 'modal',
+            headerTitle: 'Modal',
+          }}
+        />
+        <Stack.Screen
+          name="formsheet"
+          options={{
+            presentation: 'formSheet',
+            headerTitle: 'Form Sheet',
+          }}
+        />
+        <Stack.Screen
+          name="transparent-modal"
+          options={{
+            presentation: 'transparentModal',
+            headerShown: false,
+            animation: 'fade',
+          }}
+        />
+        <Stack.Screen
+          name="addLeftover"
+          options={{
+            presentation: 'modal',
+            headerTitle: 'Add Leftover',
+          }}
+        />
+        <Stack.Screen
+          name="leftoverDetail"
+          options={{
+            headerTitle: 'Leftover Details',
+          }}
+        />
+      </Stack>
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+    </ThemeProvider>
+  );
+}
+
+export default function RootLayout() {
+  const [loaded] = useFonts({
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+  });
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
+
+  if (!loaded) {
+    return null;
+  }
+
+  return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <WidgetProvider>
-        <ThemeProvider
-          value={colorScheme === 'dark' ? customDarkTheme : customLightTheme}
-        >
-          <SystemBars style={colorScheme === 'dark' ? 'light' : 'dark'} />
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="modal"
-              options={{
-                presentation: 'modal',
-                headerTitle: 'Modal',
-              }}
-            />
-            <Stack.Screen
-              name="formsheet"
-              options={{
-                presentation: 'formSheet',
-                headerTitle: 'Form Sheet',
-              }}
-            />
-            <Stack.Screen
-              name="transparent-modal"
-              options={{
-                presentation: 'transparentModal',
-                headerShown: false,
-                animation: 'fade',
-              }}
-            />
-            <Stack.Screen
-              name="addLeftover"
-              options={{
-                presentation: 'modal',
-                headerTitle: 'Add Leftover',
-              }}
-            />
-            <Stack.Screen
-              name="leftoverDetail"
-              options={{
-                headerTitle: 'Leftover Details',
-              }}
-            />
-          </Stack>
-          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        </ThemeProvider>
+        <RootLayoutContent />
       </WidgetProvider>
     </GestureHandlerRootView>
   );

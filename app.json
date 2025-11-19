@@ -1,3 +1,4 @@
+
 {
   "expo": {
     "name": "Leftover Sentry",
@@ -17,6 +18,19 @@
       "bundleIdentifier": "com.anonymous.Natively",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
+      },
+      "usesIcloudStorage": true,
+      "entitlements": {
+        "com.apple.developer.icloud-container-identifiers": [
+          "iCloud.$(CFBundleIdentifier)"
+        ],
+        "com.apple.developer.ubiquity-container-identifiers": [
+          "iCloud.$(CFBundleIdentifier)"
+        ],
+        "com.apple.developer.icloud-services": [
+          "CloudDocuments"
+        ],
+        "com.apple.developer.ubiquity-kvstore-identifier": "$(TeamIdentifierPrefix)$(CFBundleIdentifier)"
       }
     },
     "android": {
