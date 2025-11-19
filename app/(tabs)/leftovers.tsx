@@ -48,6 +48,11 @@ export default function LeftoversScreen() {
     router.push('/addLeftover');
   };
 
+  const handleRecipeSuggestions = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push('/(tabs)/recipes');
+  };
+
   const handleLeftoverPress = (leftover: Leftover) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push({
@@ -170,6 +175,35 @@ export default function LeftoversScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {leftovers.length > 0 && (
+          <TouchableOpacity
+            style={styles.recipeSuggestionBanner}
+            onPress={handleRecipeSuggestions}
+            activeOpacity={0.8}
+          >
+            <View style={styles.bannerIcon}>
+              <IconSymbol
+                ios_icon_name="lightbulb.fill"
+                android_material_icon_name="lightbulb"
+                size={28}
+                color="#ffffff"
+              />
+            </View>
+            <View style={styles.bannerText}>
+              <Text style={styles.bannerTitle}>Get Recipe Ideas!</Text>
+              <Text style={styles.bannerSubtitle}>
+                See what you can make with your leftovers
+              </Text>
+            </View>
+            <IconSymbol
+              ios_icon_name="chevron.right"
+              android_material_icon_name="chevron_right"
+              size={24}
+              color="#ffffff"
+            />
+          </TouchableOpacity>
+        )}
+
         {loading ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>Loading...</Text>
@@ -234,6 +268,39 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 120,
+  },
+  recipeSuggestionBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    boxShadow: '0px 4px 12px rgba(41, 171, 226, 0.3)',
+    elevation: 4,
+  },
+  bannerIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  bannerText: {
+    flex: 1,
+  },
+  bannerTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#ffffff',
+    marginBottom: 2,
+  },
+  bannerSubtitle: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: 'rgba(255, 255, 255, 0.9)',
   },
   listContainer: {
     gap: 12,

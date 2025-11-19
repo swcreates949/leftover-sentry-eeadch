@@ -19,6 +19,12 @@ export default function TabLayout() {
       label: 'Leftovers',
     },
     {
+      name: 'recipes',
+      route: '/(tabs)/recipes',
+      icon: 'restaurant_menu',
+      label: 'Recipes',
+    },
+    {
       name: 'profile',
       route: '/(tabs)/profile',
       icon: 'person',
@@ -36,6 +42,7 @@ export default function TabLayout() {
       >
         <Stack.Screen key="home" name="(home)" />
         <Stack.Screen key="leftovers" name="leftovers" />
+        <Stack.Screen key="recipes" name="recipes" />
         <Stack.Screen key="profile" name="profile" />
       </Stack>
       <FloatingTabBar tabs={tabs} />

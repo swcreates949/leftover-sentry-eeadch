@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Stack } from "expo-router";
 import { FlatList, StyleSheet, View } from "react-native";
@@ -10,10 +11,10 @@ export default function HomeScreen() {
   const theme = useTheme();
 
   return (
-    <>
+    <React.Fragment>
       <Stack.Screen
         options={{
-          title: "Building the app...",
+          title: "Leftover Tracker",
           headerRight: () => <HeaderRightButton />,
           headerLeft: () => <HeaderLeftButton />,
         }}
@@ -28,7 +29,7 @@ export default function HomeScreen() {
           showsVerticalScrollIndicator={false}
         />
       </View>
-    </>
+    </React.Fragment>
   );
 }
 

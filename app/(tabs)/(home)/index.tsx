@@ -14,6 +14,11 @@ export default function HomeScreen() {
     router.push('/(tabs)/leftovers');
   };
 
+  const handleNavigateToRecipes = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push('/(tabs)/recipes');
+  };
+
   return (
     <View style={[commonStyles.container]}>
       <ScrollView
@@ -29,7 +34,7 @@ export default function HomeScreen() {
           />
           <Text style={styles.heroTitle}>Leftover Tracker</Text>
           <Text style={styles.heroSubtitle}>
-            Never waste food again! Track what&apos;s in your fridge and know when to eat it.
+            Never waste food again! Track what&apos;s in your fridge and get recipe ideas.
           </Text>
         </View>
 
@@ -54,9 +59,36 @@ export default function HomeScreen() {
           </View>
           <IconSymbol
             ios_icon_name="chevron.right"
-            android_material_icon_name="chevron-right"
+            android_material_icon_name="chevron_right"
             size={24}
             color={colors.textSecondary}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.featureCard, styles.recipeCard]}
+          onPress={handleNavigateToRecipes}
+          activeOpacity={0.7}
+        >
+          <View style={[styles.featureIconContainer, styles.recipeIconContainer]}>
+            <IconSymbol
+              ios_icon_name="lightbulb.fill"
+              android_material_icon_name="lightbulb"
+              size={32}
+              color="#ffffff"
+            />
+          </View>
+          <View style={styles.featureContent}>
+            <Text style={[styles.featureTitle, styles.recipeTitle]}>Get Recipe Ideas</Text>
+            <Text style={[styles.featureDescription, styles.recipeDescription]}>
+              Discover recipes based on your leftovers and rate them
+            </Text>
+          </View>
+          <IconSymbol
+            ios_icon_name="chevron.right"
+            android_material_icon_name="chevron_right"
+            size={24}
+            color="#ffffff"
           />
         </TouchableOpacity>
 
@@ -90,6 +122,18 @@ export default function HomeScreen() {
           <View style={styles.stepCard}>
             <View style={styles.stepNumber}>
               <Text style={styles.stepNumberText}>3</Text>
+            </View>
+            <View style={styles.stepContent}>
+              <Text style={styles.stepTitle}>Get Recipe Ideas</Text>
+              <Text style={styles.stepDescription}>
+                Browse recipe suggestions that match your leftovers and rate them
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.stepCard}>
+            <View style={styles.stepNumber}>
+              <Text style={styles.stepNumberText}>4</Text>
             </View>
             <View style={styles.stepContent}>
               <Text style={styles.stepTitle}>Reduce Waste</Text>
@@ -173,9 +217,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: 16,
     padding: 20,
-    marginBottom: 32,
+    marginBottom: 16,
     boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
     elevation: 3,
+  },
+  recipeCard: {
+    backgroundColor: colors.primary,
+    marginBottom: 32,
   },
   featureIconContainer: {
     width: 56,
@@ -186,6 +234,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 16,
   },
+  recipeIconContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
   featureContent: {
     flex: 1,
   },
@@ -195,11 +246,17 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 4,
   },
+  recipeTitle: {
+    color: '#ffffff',
+  },
   featureDescription: {
     fontSize: 14,
     fontWeight: '400',
     color: colors.textSecondary,
     lineHeight: 20,
+  },
+  recipeDescription: {
+    color: 'rgba(255, 255, 255, 0.9)',
   },
   infoSection: {
     marginBottom: 32,
