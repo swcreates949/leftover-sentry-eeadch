@@ -1,8 +1,7 @@
-
 {
   "expo": {
     "name": "Leftover Tracker",
-    "slug": "leftover-tracker",
+    "slug": "Leftover Tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
@@ -71,8 +70,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "your-project-id-here"
+        "projectId": "e02af883-a144-46a2-ad0d-e7717a3c1eb0"
       }
     }
-  }
+  },
+  "scheme": "Leftover Tracker"
 }

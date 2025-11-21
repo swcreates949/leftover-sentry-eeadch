@@ -21,7 +21,7 @@ export default function TabLayout() {
     {
       name: 'recipes',
       route: '/(tabs)/recipes',
-      icon: 'restaurant_menu',
+      icon: 'restaurant',
       label: 'Recipes',
     },
     {
