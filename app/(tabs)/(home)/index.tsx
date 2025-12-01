@@ -5,6 +5,8 @@ import { useRouter } from "expo-router";
 import { IconSymbol } from "@/components/IconSymbol";
 import { colors, commonStyles } from "@/styles/commonStyles";
 import * as Haptics from "expo-haptics";
+import AdBanner from "@/components/AdBanner";
+import { BannerAdSize } from "react-native-google-mobile-ads";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -47,6 +49,9 @@ export default function HomeScreen() {
             Never waste food again! Track what&apos;s in your fridge and get recipe ideas.
           </Text>
         </View>
+
+        {/* Ad Banner */}
+        <AdBanner size={BannerAdSize.MEDIUM_RECTANGLE} />
 
         <TouchableOpacity
           style={[styles.featureCard, { padding: width * 0.04 }]}
@@ -157,6 +162,9 @@ export default function HomeScreen() {
             </View>
           </View>
         </View>
+
+        {/* Another Ad Banner */}
+        <AdBanner size={BannerAdSize.BANNER} />
 
         <View style={[styles.tipsSection, { marginBottom: height * 0.025 }]}>
           <Text style={[styles.sectionTitle, { fontSize: Math.min(width * 0.055, 22), marginBottom: height * 0.015 }]}>

@@ -61,6 +61,13 @@
           "photosPermission": "The app needs access to your photos to let you select images of your leftovers.",
           "cameraPermission": "The app needs access to your camera to let you take photos of your leftovers."
         }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+        }
       ]
     ],
     "scheme": "leftoversentry",

@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useColorScheme, Alert } from 'react-native';
+import { useColorScheme, Alert, Platform } from 'react-native';
 import { SystemBars } from 'react-native-edge-to-edge';
 import 'react-native-reanimated';
 import { Stack, router } from 'expo-router';
@@ -18,6 +18,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useNetworkState } from 'expo-network';
 import * as Notifications from 'expo-notifications';
 import { useAppStateSync } from '@/hooks/useAppStateSync';
+import { initializeAds } from '@/utils/adManager';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,6 +28,13 @@ function RootLayoutContent() {
 
   // Enable automatic iCloud sync when app comes to foreground
   useAppStateSync();
+
+  // Initialize ads
+  useEffect(() => {
+    if (Platform.OS !== 'web') {
+      initializeAds();
+    }
+  }, []);
 
   // Set up notification listeners
   useEffect(() => {

@@ -16,12 +16,17 @@ import { colors, commonStyles } from '@/styles/commonStyles';
 import { Leftover } from '@/types/leftover';
 import { leftoverStorage, calculateDaysRemaining, getExpiryStatus } from '@/utils/leftoverStorage';
 import * as Haptics from 'expo-haptics';
+import AdBanner from '@/components/AdBanner';
+import { BannerAdSize } from 'react-native-google-mobile-ads';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 
 export default function LeftoversScreen() {
   const router = useRouter();
   const { width, height } = useWindowDimensions();
   const [leftovers, setLeftovers] = useState<Leftover[]>([]);
   const [loading, setLoading] = useState(true);
+  const [addCount, setAddCount] = useState(0);
+  const { loaded: interstitialLoaded, showAd: showInterstitialAd } = useInterstitialAd();
 
   // Responsive sizing
   const padding = width * 0.04;
@@ -52,8 +57,17 @@ export default function LeftoversScreen() {
     }, [])
   );
 
-  const handleAddLeftover = () => {
+  const handleAddLeftover = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    
+    // Show interstitial ad every 3 additions
+    const newCount = addCount + 1;
+    setAddCount(newCount);
+    
+    if (newCount % 3 === 0 && Platform.OS !== 'web') {
+      await showInterstitialAd();
+    }
+    
     router.push('/addLeftover');
   };
 
@@ -215,6 +229,11 @@ export default function LeftoversScreen() {
               color="#ffffff"
             />
           </TouchableOpacity>
+        )}
+
+        {/* Ad Banner after 3 items */}
+        {leftovers.length >= 3 && (
+          <AdBanner size={BannerAdSize.BANNER} />
         )}
 
         {loading ? (

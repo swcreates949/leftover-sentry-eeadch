@@ -18,6 +18,8 @@ import { Leftover } from '@/types/leftover';
 import { leftoverStorage } from '@/utils/leftoverStorage';
 import { getRecipeSuggestions, rateRecipe } from '@/utils/supabaseClient';
 import * as Haptics from 'expo-haptics';
+import AdBanner from '@/components/AdBanner';
+import { BannerAdSize } from 'react-native-google-mobile-ads';
 
 export default function RecipesScreen() {
   const router = useRouter();
@@ -314,7 +316,15 @@ export default function RecipesScreen() {
             <Text style={[styles.resultsText, { fontSize: Math.min(width * 0.035, 13), marginBottom: height * 0.01 }]}>
               Found {suggestions.length} recipe{suggestions.length !== 1 ? 's' : ''}
             </Text>
-            {suggestions.map((recipe, index) => renderRecipeCard(recipe, index))}
+            
+            {/* Ad Banner after first 2 recipes */}
+            {suggestions.slice(0, 2).map((recipe, index) => renderRecipeCard(recipe, index))}
+            
+            {suggestions.length > 2 && (
+              <AdBanner size={BannerAdSize.MEDIUM_RECTANGLE} />
+            )}
+            
+            {suggestions.slice(2).map((recipe, index) => renderRecipeCard(recipe, index + 2))}
           </View>
         )}
       </ScrollView>
