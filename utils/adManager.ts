@@ -39,7 +39,7 @@ export const AD_UNIT_IDS = {
     android: TestIds.BANNER,
   },
   interstitial: {
-    ios: 'ca-app-pub-9706636677421693~9226138387',
+    ios: TestIds.INTERSTITIAL,
     android: TestIds.INTERSTITIAL,
   },
   rewarded: {
